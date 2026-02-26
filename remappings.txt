@@ -1,0 +1,4 @@
+openzeppelin-contracts/=lib/openzeppelin-contracts/
+forge-std/=lib/forge-std/src/
+chainlink-ccip/=lib/chainlink-ccip/
+@chainlink/contracts/src/v0.8/vendor/openzeppelin-solidity/v5.0.2/contracts/=lib/openzeppelin-contracts/contracts/
