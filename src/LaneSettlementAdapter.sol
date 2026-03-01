@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.24;
+pragma solidity 0.8.24;
 
 import { CCIPReceiver } from "chainlink-ccip/chains/evm/contracts/applications/CCIPReceiver.sol";
 import { Client } from "chainlink-ccip/chains/evm/contracts/libraries/Client.sol";
@@ -24,7 +24,7 @@ contract LaneSettlementAdapter is CCIPReceiver {
 
   struct SettlementPayload {
     uint16 version;
-    address vault;
+    address targetVault;
     uint256 chainId;
     bytes32 routeId;
     bytes32 fillId;
@@ -80,7 +80,7 @@ contract LaneSettlementAdapter is CCIPReceiver {
 
     SettlementPayload memory payload = abi.decode(message.data, (SettlementPayload));
     if (payload.version != PAYLOAD_VERSION) revert InvalidPayload("invalid_version");
-    if (payload.vault != address(vault)) revert InvalidPayload("invalid_vault");
+    if (payload.targetVault != address(vault)) revert InvalidPayload("invalid_vault");
     if (payload.chainId != block.chainid) revert InvalidPayload("invalid_chainid");
     if (payload.fillId == bytes32(0) || payload.principalAssets == 0) revert InvalidPayload("invalid_settlement");
 

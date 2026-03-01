@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.24;
+pragma solidity 0.8.24;
 
 import { ERC20 } from "openzeppelin-contracts/contracts/token/ERC20/ERC20.sol";
 import { IERC20 } from "openzeppelin-contracts/contracts/token/ERC20/IERC20.sol";
@@ -28,6 +28,8 @@ contract LaneVault4626 is ERC4626, AccessControlDefaultAdminRules, ReentrancyGua
   error UtilizationCapExceeded();
   error InvariantViolation(string reason);
   error TransferNotAllowlisted(address from, address to);
+  error ReservationNotExpired(bytes32 routeId, uint64 expiry);
+  error BalanceDeficit(uint256 expected, uint256 actual);
 
   bytes32 public constant GOVERNANCE_ROLE = keccak256("GOVERNANCE_ROLE");
   bytes32 public constant OPS_ROLE = keccak256("OPS_ROLE");
@@ -63,6 +65,7 @@ contract LaneVault4626 is ERC4626, AccessControlDefaultAdminRules, ReentrancyGua
     FillStatus status;
     bytes32 routeId;
     uint256 amount;
+    uint64 executedAt;
   }
 
   struct PreviewOutcome {
@@ -120,6 +123,13 @@ contract LaneVault4626 is ERC4626, AccessControlDefaultAdminRules, ReentrancyGua
   event SettlementSuccess(bytes32 indexed fillId, bytes32 indexed routeId, uint256 principal, uint256 netFeeIncome);
   event SettlementLoss(bytes32 indexed fillId, bytes32 indexed routeId, uint256 principal, uint256 recovered);
 
+  error EmergencyReleaseNotReady(bytes32 fillId, uint256 readyAt);
+
+  uint48 public emergencyReleaseDelay = 3 days;
+
+  event EmergencyReleaseDelayUpdated(uint48 newDelay);
+  event EmergencyFillReleased(bytes32 indexed fillId, bytes32 indexed routeId, uint256 principal, uint256 recovered);
+  event ReservationExpired(bytes32 indexed routeId, uint256 amount);
   event RedeemQueued(uint256 indexed requestId, address indexed owner, address indexed receiver, uint256 shares);
   event RedeemQueueProcessed(uint256 indexed requestId, address indexed receiver, uint256 shares, uint256 assetsPaid);
   event ProtocolFeesClaimed(address indexed to, uint256 amount);
@@ -140,6 +150,13 @@ contract LaneVault4626 is ERC4626, AccessControlDefaultAdminRules, ReentrancyGua
     isTransferAllowlisted[address(queueManager)] = true;
   }
 
+  /// @notice Virtual decimals offset to prevent ERC-4626 inflation attacks.
+  /// @dev This creates a 1e3 virtual offset in share/asset conversion, making first-depositor
+  ///      share price manipulation economically unviable.
+  function _decimalsOffset() internal pure override returns (uint8) {
+    return 3;
+  }
+
   /// @notice LP NAV excludes protocol-accrued fees immediately.
   function totalAssets() public view override returns (uint256) {
     uint256 grossAssets = freeLiquidityAssets + reservedLiquidityAssets + inFlightLiquidityAssets;
@@ -147,6 +164,18 @@ contract LaneVault4626 is ERC4626, AccessControlDefaultAdminRules, ReentrancyGua
       return 0;
     }
     return grossAssets - protocolFeeAccruedAssets;
+  }
+
+  /// @notice ERC-4626 compliance: return 0 when deposits are not possible.
+  function maxDeposit(address) public view override returns (uint256) {
+    if (globalPaused || depositPaused) return 0;
+    return type(uint256).max;
+  }
+
+  /// @notice ERC-4626 compliance: return 0 when minting is not possible.
+  function maxMint(address) public view override returns (uint256) {
+    if (globalPaused || depositPaused) return 0;
+    return type(uint256).max;
   }
 
   function maxWithdraw(address owner) public view override returns (uint256) {
@@ -377,6 +406,27 @@ contract LaneVault4626 is ERC4626, AccessControlDefaultAdminRules, ReentrancyGua
     emit ReservationReleased(routeId, amount);
   }
 
+  /// @notice Permissionlessly release a reservation whose expiry has passed.
+  /// @dev Anyone can call this to free liquidity blocked by stale reservations.
+  function expireReservation(bytes32 routeId) external nonReentrant {
+    if (routeId == bytes32(0)) revert InvalidIdentifier();
+
+    RouteReservation storage route = routes[routeId];
+    if (route.status != RouteStatus.Reserved) revert InvalidTransition();
+    if (block.timestamp < route.expiry) revert ReservationNotExpired(routeId, route.expiry);
+
+    uint256 amount = route.amount;
+    reservedLiquidityAssets -= amount;
+    freeLiquidityAssets += amount;
+
+    route.status = RouteStatus.Released;
+    route.amount = 0;
+    route.fillId = bytes32(0);
+
+    _assertAccountingInvariants();
+    emit ReservationExpired(routeId, amount);
+  }
+
   function executeFill(bytes32 routeId, bytes32 fillId, uint256 amount) external nonReentrant onlyRole(OPS_ROLE) {
     _requireNotGlobalPaused();
     if (reservePaused) revert ReservePaused();
@@ -397,6 +447,7 @@ contract LaneVault4626 is ERC4626, AccessControlDefaultAdminRules, ReentrancyGua
     fill.status = FillStatus.Executed;
     fill.routeId = routeId;
     fill.amount = amount;
+    fill.executedAt = uint64(block.timestamp);
 
     _assertAccountingInvariants();
     emit FillExecuted(fillId, routeId, amount);
@@ -415,6 +466,12 @@ contract LaneVault4626 is ERC4626, AccessControlDefaultAdminRules, ReentrancyGua
 
     RouteReservation storage route = routes[fill.routeId];
     if (route.status != RouteStatus.Filled || route.fillId != fillId) revert InvalidTransition();
+
+    // Verify tokens actually arrived before crediting internal accounting
+    uint256 expectedBalance = freeLiquidityAssets + principalAssets + netFeeIncomeAssets
+      + reservedLiquidityAssets + protocolFeeAccruedAssets + badDebtReserveAssets;
+    uint256 actualBalance = IERC20(asset()).balanceOf(address(this));
+    if (actualBalance < expectedBalance) revert BalanceDeficit(expectedBalance, actualBalance);
 
     uint256 reserveCut = (netFeeIncomeAssets * badDebtReserveCutBps) / BPS_DENOMINATOR;
     uint256 protocolFee = (netFeeIncomeAssets * protocolFeeBps) / BPS_DENOMINATOR;
@@ -476,6 +533,49 @@ contract LaneVault4626 is ERC4626, AccessControlDefaultAdminRules, ReentrancyGua
 
     _assertAccountingInvariants();
     emit ProtocolFeesClaimed(to, amount);
+  }
+
+  /// @notice Emergency release a fill stuck in Executed state after the delay has elapsed.
+  /// @dev Marks the fill as a loss, absorbs via bad debt reserve. Use when CCIP settlement is stuck.
+  /// @param fillId The fill to release
+  /// @param recoveredAssets Actual tokens recovered (0 if total loss, or partial if manually rescued)
+  function emergencyReleaseFill(bytes32 fillId, uint256 recoveredAssets)
+    external
+    nonReentrant
+    onlyRole(GOVERNANCE_ROLE)
+  {
+    if (fillId == bytes32(0)) revert InvalidIdentifier();
+
+    FillPosition storage fill = fills[fillId];
+    if (fill.status != FillStatus.Executed) revert InvalidTransition();
+    if (recoveredAssets > fill.amount) revert InvalidAmount();
+
+    uint64 readyAt = fill.executedAt + emergencyReleaseDelay;
+    if (block.timestamp < readyAt) revert EmergencyReleaseNotReady(fillId, readyAt);
+
+    RouteReservation storage route = routes[fill.routeId];
+
+    uint256 principal = fill.amount;
+    uint256 loss = principal - recoveredAssets;
+    uint256 reserveAbsorb = badDebtReserveAssets < loss ? badDebtReserveAssets : loss;
+    uint256 uncovered = loss - reserveAbsorb;
+
+    inFlightLiquidityAssets -= principal;
+    freeLiquidityAssets += recoveredAssets;
+    badDebtReserveAssets -= reserveAbsorb;
+    realizedNavLossAssets += uncovered;
+
+    fill.status = FillStatus.SettledLoss;
+    route.status = RouteStatus.SettledLoss;
+
+    _assertAccountingInvariants();
+    emit EmergencyFillReleased(fillId, fill.routeId, principal, recoveredAssets);
+  }
+
+  function setEmergencyReleaseDelay(uint48 newDelay) external onlyRole(GOVERNANCE_ROLE) {
+    require(newDelay >= 1 days, "Minimum 1 day delay");
+    emergencyReleaseDelay = newDelay;
+    emit EmergencyReleaseDelayUpdated(newDelay);
   }
 
   function _update(address from, address to, uint256 value) internal override {

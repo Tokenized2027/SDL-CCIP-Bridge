@@ -81,14 +81,17 @@ contract LaneVault4626Test is Test {
     vm.prank(alice);
     vault.deposit(1_000, alice);
 
+    uint256 aliceShares = vault.balanceOf(alice);
+    uint256 redeemShares = aliceShares * 400 / 1_000; // 40% of shares ≈ 400 assets
+
     vm.prank(alice);
-    uint256 requestId = vault.requestRedeem(400, receiver, alice);
+    uint256 requestId = vault.requestRedeem(redeemShares, receiver, alice);
 
     LaneQueueManager queue = vault.queueManager();
 
     assertEq(requestId, 1, "request id mismatch");
-    assertEq(vault.balanceOf(alice), 600, "owner shares should be escrowed");
-    assertEq(vault.balanceOf(address(vault)), 400, "vault should hold escrowed shares");
+    assertEq(vault.balanceOf(alice), aliceShares - redeemShares, "owner shares should be escrowed");
+    assertEq(vault.balanceOf(address(vault)), redeemShares, "vault should hold escrowed shares");
     assertEq(queue.pendingCount(), 1, "queue pending count mismatch");
     assertEq(vault.queueCancellationPolicy(), "no_cancel_once_enqueued", "queue cancellation policy mismatch");
 
@@ -100,7 +103,8 @@ contract LaneVault4626Test is Test {
     assertEq(processed, 1, "processed queue count mismatch");
     assertEq(queue.pendingCount(), 0, "queue should be empty");
     assertEq(vault.balanceOf(address(vault)), 0, "escrowed shares should be burned");
-    assertEq(asset.balanceOf(receiver), 400, "receiver payout mismatch");
+    // With virtual offset, slight rounding may occur but should be ≈400
+    assertApproxEqAbs(asset.balanceOf(receiver), 400, 1, "receiver payout mismatch");
   }
 
   function testMaxWithdrawAndRedeemRespectFreeLiquidity() public {
@@ -110,10 +114,17 @@ contract LaneVault4626Test is Test {
     vault.setPolicy(1_000, 9_000, 2_000, 0, 1_000);
     vault.reserveLiquidity(ROUTE_A, 800, uint64(block.timestamp + 1 hours));
 
+    // maxWithdraw bounded by free liquidity (200 assets)
     assertEq(vault.maxWithdraw(alice), 200, "maxWithdraw must be free-liquidity bounded");
-    assertEq(vault.maxRedeem(alice), 200, "maxRedeem must be free-liquidity bounded");
 
-    LaneVault4626.PreviewOutcome memory redeemOutcome = vault.previewRedeemOutcome(500);
+    // maxRedeem returns shares equivalent to 200 assets (with decimals offset, shares = assets * 1000)
+    uint256 maxRedeemShares = vault.maxRedeem(alice);
+    uint256 maxRedeemAssets = vault.previewRedeem(maxRedeemShares);
+    assertEq(maxRedeemAssets, 200, "maxRedeem asset equivalent must be free-liquidity bounded");
+
+    // Preview outcome uses shares, so convert 500 assets to equivalent shares first
+    uint256 shares500 = vault.convertToShares(500);
+    LaneVault4626.PreviewOutcome memory redeemOutcome = vault.previewRedeemOutcome(shares500);
     assertEq(redeemOutcome.instantAssets, 200, "instant redeem assets mismatch");
     assertEq(redeemOutcome.queuedAssets, 300, "queued redeem assets mismatch");
 

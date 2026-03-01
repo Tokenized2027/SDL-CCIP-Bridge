@@ -132,7 +132,7 @@ contract LaneSettlementAdapterTest is Test {
     );
 
     payload = _validPayload(keccak256("fill-2"));
-    payload.vault = makeAddr("wrong-vault");
+    payload.targetVault = makeAddr("wrong-vault");
     vm.expectRevert(abi.encodeWithSelector(LaneSettlementAdapter.InvalidPayload.selector, "invalid_vault"));
     router.deliver(
       address(adapter), _buildMessage(SOURCE_CHAIN_A, sourceSenderA, keccak256("msg-vault"), abi.encode(payload))
@@ -219,7 +219,7 @@ contract LaneSettlementAdapterTest is Test {
   {
     payload = LaneSettlementAdapter.SettlementPayload({
       version: adapter.PAYLOAD_VERSION(),
-      vault: address(vault),
+      targetVault: address(vault),
       chainId: block.chainid,
       routeId: keccak256(abi.encode(fillId, "route")),
       fillId: fillId,

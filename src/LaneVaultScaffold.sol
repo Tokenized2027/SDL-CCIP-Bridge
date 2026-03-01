@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.24;
+pragma solidity 0.8.24;
 
 /// @title LaneVaultScaffold
 /// @notice Phase-2 Solidity scaffold that mirrors the Python LP vault invariant model.
