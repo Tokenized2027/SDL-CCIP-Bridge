@@ -95,8 +95,8 @@ contract LaneVault4626EnhancedInvariantTest is Test {
 
   // ═══════════════ INV-SHARE ═══════════════
   function _assertInvariant_ShareConservation() internal {
-    uint256 sumBalances = vault.balanceOf(alice) + vault.balanceOf(bob) + vault.balanceOf(carol)
-      + vault.balanceOf(dave) + vault.balanceOf(eve) + vault.balanceOf(address(vault));
+    uint256 sumBalances = vault.balanceOf(alice) + vault.balanceOf(bob) + vault.balanceOf(carol) + vault.balanceOf(dave)
+      + vault.balanceOf(eve) + vault.balanceOf(address(vault));
 
     assertEq(vault.totalSupply(), sumBalances, "INV-SHARE: share conservation violated");
   }
@@ -134,10 +134,9 @@ contract LaneVault4626EnhancedInvariantTest is Test {
   function _assertInvariant_AssetSufficiency() internal {
     if (vault.totalSupply() == 0) return;
 
-    uint256 sumWithdrawable = vault.previewRedeem(vault.balanceOf(alice))
-      + vault.previewRedeem(vault.balanceOf(bob)) + vault.previewRedeem(vault.balanceOf(carol))
-      + vault.previewRedeem(vault.balanceOf(dave)) + vault.previewRedeem(vault.balanceOf(eve))
-      + vault.previewRedeem(vault.balanceOf(address(vault)));
+    uint256 sumWithdrawable = vault.previewRedeem(vault.balanceOf(alice)) + vault.previewRedeem(vault.balanceOf(bob))
+      + vault.previewRedeem(vault.balanceOf(carol)) + vault.previewRedeem(vault.balanceOf(dave))
+      + vault.previewRedeem(vault.balanceOf(eve)) + vault.previewRedeem(vault.balanceOf(address(vault)));
 
     // Allow 1 wei rounding tolerance per user
     assertGe(vault.totalAssets() + 6, sumWithdrawable, "INV-ASSET: totalAssets < sum of withdrawable");
@@ -146,14 +145,10 @@ contract LaneVault4626EnhancedInvariantTest is Test {
   // ═══════════════ INV-ACCOUNTING ═══════════════
   function _assertInvariant_AccountingBounds() internal {
     assertLe(
-      vault.badDebtReserveAssets(),
-      vault.freeLiquidityAssets(),
-      "INV-ACCOUNTING: bad debt reserve > free liquidity"
+      vault.badDebtReserveAssets(), vault.freeLiquidityAssets(), "INV-ACCOUNTING: bad debt reserve > free liquidity"
     );
     assertLe(
-      vault.protocolFeeAccruedAssets(),
-      vault.freeLiquidityAssets(),
-      "INV-ACCOUNTING: protocol fee > free liquidity"
+      vault.protocolFeeAccruedAssets(), vault.freeLiquidityAssets(), "INV-ACCOUNTING: protocol fee > free liquidity"
     );
   }
 
@@ -213,7 +208,7 @@ contract LaneVault4626EnhancedInvariantTest is Test {
       vault.reconcileSettlementSuccess(fillId, amount, feeIncome);
       ghostTotalFeeIncome += feeIncome;
       ghostSettlements += 1;
-    } catch {}
+    } catch { }
   }
 
   function _actionReserveAndSettleLoss(uint96 reserveAmount) internal {
@@ -233,7 +228,7 @@ contract LaneVault4626EnhancedInvariantTest is Test {
       vault.reconcileSettlementLoss(fillId, amount, recovered);
       ghostTotalLoss += (amount - recovered);
       ghostSettlements += 1;
-    } catch {}
+    } catch { }
   }
 
   function _actor(uint256 seed) internal view returns (address) {

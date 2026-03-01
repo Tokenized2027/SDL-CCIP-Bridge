@@ -47,13 +47,7 @@ contract DeployLaneVault is Script {
     vm.startBroadcast(initialAdmin);
 
     // 1. Deploy vault
-    LaneVault4626 vault = new LaneVault4626(
-      IERC20(asset),
-      "Lane Vault LP",
-      "lvLP",
-      defaultAdminDelay,
-      initialAdmin
-    );
+    LaneVault4626 vault = new LaneVault4626(IERC20(asset), "Lane Vault LP", "lvLP", defaultAdminDelay, initialAdmin);
     console.log("Vault deployed:", address(vault));
 
     // 2. Deploy CCIP settlement adapter

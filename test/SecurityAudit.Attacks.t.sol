@@ -105,11 +105,7 @@ contract SecurityAuditAttacksTest is Test {
     // Try emergency release immediately — should fail (3 day default delay)
     vm.prank(governance);
     vm.expectRevert(
-      abi.encodeWithSelector(
-        LaneVault4626.EmergencyReleaseNotReady.selector,
-        fillId,
-        block.timestamp + 3 days
-      )
+      abi.encodeWithSelector(LaneVault4626.EmergencyReleaseNotReady.selector, fillId, block.timestamp + 3 days)
     );
     vault.emergencyReleaseFill(fillId, 0);
   }
@@ -218,9 +214,7 @@ contract SecurityAuditAttacksTest is Test {
 
     // Verify invariant: protocolFeeAccruedAssets <= freeLiquidityAssets
     assertLe(
-      vault.protocolFeeAccruedAssets(),
-      vault.freeLiquidityAssets(),
-      "ATK-B08: protocol fees exceed free liquidity"
+      vault.protocolFeeAccruedAssets(), vault.freeLiquidityAssets(), "ATK-B08: protocol fees exceed free liquidity"
     );
 
     // Try claiming more than accrued — should revert
