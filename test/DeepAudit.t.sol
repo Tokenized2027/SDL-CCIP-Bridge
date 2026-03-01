@@ -82,32 +82,21 @@ contract DeepAuditLaneVaultTest is Test {
     // If reconcileSettlementSuccess is called WITHOUT tokens arriving,
     // freeLiquidityAssets inflates beyond actual balance
 
-    function test_PROP_LV1_phantomAsset_detection() public {
+    /// @notice Verify that the balance check in reconcileSettlementSuccess
+    ///         prevents phantom asset inflation when fee income tokens don't arrive.
+    function test_PROP_LV1_phantomAsset_blocked() public {
         vm.prank(alice);
         vault.deposit(10_000, alice);
 
         vault.reserveLiquidity(ROUTE_A, 3_000, uint64(block.timestamp + 1 hours));
         vault.executeFill(ROUTE_A, FILL_A, 3_000);
 
-        // Settlement claims fee income but NO ACTUAL TOKENS arrive
+        // Settlement claims fee income but NO ACTUAL TOKENS arrive — must revert
         vault.setSettlementAdapter(address(this));
+        vm.expectRevert(
+            abi.encodeWithSelector(LaneVault4626.BalanceDeficit.selector, 10_100, 10_000)
+        );
         vault.reconcileSettlementSuccess(FILL_A, 3_000, 100);
-
-        // NOW: freeLiquidityAssets includes 3100 (3000 principal + 100 fee) that were added
-        // but actual vault balance only has 7000 (10000 - 3000 from fill)
-        // This IS the phantom asset vector
-
-        uint256 actualBalance = asset.balanceOf(address(vault));
-        uint256 freeLiquidity = vault.freeLiquidityAssets();
-
-        // This assertion SHOULD fail — documenting the gap
-        // In a perfect world: actualBalance >= freeLiquidity
-        // With phantom: actualBalance < freeLiquidity (unless tokens arrived via CCIP)
-        if (actualBalance < freeLiquidity) {
-            // Expected: phantom asset gap detected
-            uint256 gap = freeLiquidity - actualBalance;
-            assertGt(gap, 0, "Phantom asset gap should be positive when tokens don't arrive");
-        }
     }
 
     // ═══════════ PROP-LV-3: Zero Supply Implies Zero Assets ═══════════

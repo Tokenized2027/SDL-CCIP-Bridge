@@ -98,7 +98,8 @@ contract LaneVault4626AttacksTest is Test {
     vault.reserveLiquidity(routeA, 10_000, uint64(block.timestamp + 1 hours));
     vault.executeFill(routeA, fillA, 10_000);
 
-    // First settlement: success
+    // First settlement: success (fee income arrives via CCIP)
+    asset.mint(address(vault), 500);
     vault.reconcileSettlementSuccess(fillA, 10_000, 500);
 
     // Second settlement attempt: must revert (fill already settled)
@@ -297,6 +298,7 @@ contract LaneVault4626AttacksTest is Test {
 
     vault.reserveLiquidity(routeId, 10_000, uint64(block.timestamp + 1 hours));
     vault.executeFill(routeId, fillId, 10_000);
+    asset.mint(address(vault), 100); // fee income arrives via CCIP
     vault.reconcileSettlementSuccess(fillId, 10_000, 100);
 
     // Route is now SettledSuccess, cannot be re-reserved

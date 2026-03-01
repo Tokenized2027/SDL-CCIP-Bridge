@@ -38,6 +38,7 @@ contract LaneVault4626Test is Test {
 
     vault.reserveLiquidity(ROUTE_A, 500, uint64(block.timestamp + 1 hours));
     vault.executeFill(ROUTE_A, FILL_A, 500);
+    asset.mint(address(vault), 100); // fee income arrives via CCIP
     vault.reconcileSettlementSuccess(FILL_A, 500, 100);
 
     assertEq(vault.protocolFeeAccruedAssets(), 5, "protocol fee accrual mismatch");

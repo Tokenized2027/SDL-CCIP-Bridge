@@ -209,6 +209,7 @@ contract LaneVault4626EnhancedInvariantTest is Test {
 
     try vault.reserveLiquidity(routeId, amount, uint64(block.timestamp + 1 hours)) {
       vault.executeFill(routeId, fillId, amount);
+      if (feeIncome > 0) asset.mint(address(vault), feeIncome); // fee income arrives via CCIP
       vault.reconcileSettlementSuccess(fillId, amount, feeIncome);
       ghostTotalFeeIncome += feeIncome;
       ghostSettlements += 1;

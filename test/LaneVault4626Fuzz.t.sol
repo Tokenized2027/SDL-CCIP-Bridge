@@ -144,6 +144,7 @@ contract LaneVault4626FuzzTest is Test {
     vault.executeFill(routeId, fillId, reserveAssets);
 
     uint256 feeAssets = bound(uint256(feeIncome), 0, reserveAssets / 10);
+    if (feeAssets > 0) asset.mint(address(vault), feeAssets); // fee income arrives via CCIP
     vault.reconcileSettlementSuccess(fillId, reserveAssets, feeAssets);
 
     vm.expectRevert(LaneVault4626.InvalidTransition.selector);

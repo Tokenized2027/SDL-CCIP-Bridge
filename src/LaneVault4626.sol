@@ -467,11 +467,13 @@ contract LaneVault4626 is ERC4626, AccessControlDefaultAdminRules, ReentrancyGua
     RouteReservation storage route = routes[fill.routeId];
     if (route.status != RouteStatus.Filled || route.fillId != fillId) revert InvalidTransition();
 
-    // Verify tokens actually arrived before crediting internal accounting
-    uint256 expectedBalance = freeLiquidityAssets + principalAssets + netFeeIncomeAssets
-      + reservedLiquidityAssets + protocolFeeAccruedAssets + badDebtReserveAssets;
+    // Verify fee income tokens actually arrived before crediting.
+    // Vault already holds tokens for free + reserved + inFlight (executeFill is accounting-only).
+    // Only the net fee income represents NEW tokens that must have been transferred in.
+    uint256 currentHeld = freeLiquidityAssets + reservedLiquidityAssets + inFlightLiquidityAssets;
+    uint256 requiredBalance = currentHeld + netFeeIncomeAssets;
     uint256 actualBalance = IERC20(asset()).balanceOf(address(this));
-    if (actualBalance < expectedBalance) revert BalanceDeficit(expectedBalance, actualBalance);
+    if (actualBalance < requiredBalance) revert BalanceDeficit(requiredBalance, actualBalance);
 
     uint256 reserveCut = (netFeeIncomeAssets * badDebtReserveCutBps) / BPS_DENOMINATOR;
     uint256 protocolFee = (netFeeIncomeAssets * protocolFeeBps) / BPS_DENOMINATOR;
