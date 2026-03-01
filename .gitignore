@@ -1,3 +1,25 @@
-/cache/
-/out/
+# Compiler output
+out/
+cache/
 
+# Dependencies (installed via forge)
+lib/
+
+# Env files
+.env
+.env.*
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+
+# Foundry broadcast artifacts
+broadcast/
+
+# Coverage
+lcov.info
+coverage/

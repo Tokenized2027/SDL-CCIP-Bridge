@@ -193,11 +193,10 @@ contract LaneVault4626 is ERC4626, AccessControlDefaultAdminRules, ReentrancyGua
   }
 
   function availableFreeLiquidityForLP() public view returns (uint256) {
-    uint256 reserved = protocolFeeAccruedAssets + badDebtReserveAssets;
-    if (freeLiquidityAssets <= reserved) {
+    if (freeLiquidityAssets <= protocolFeeAccruedAssets) {
       return 0;
     }
-    return freeLiquidityAssets - reserved;
+    return freeLiquidityAssets - protocolFeeAccruedAssets;
   }
 
   function previewRedeemOutcome(uint256 shares) external view returns (PreviewOutcome memory outcome) {
