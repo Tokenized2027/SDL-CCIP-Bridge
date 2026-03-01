@@ -46,7 +46,7 @@ The system consists of four Solidity contracts:
 
 ```
 +------------------------------------------+
-|           LaneVault4626 (617 LOC)         |
+|           LaneVault4626 (616 LOC)         |
 |                                           |
 |  ERC-4626 vault with:                     |
 |  - 5-bucket liquidity accounting          |
@@ -470,9 +470,9 @@ The contract system underwent two independent audit passes:
 |----------|-------|-------|------------|
 | Critical | 0 | -- | -- |
 | High | 0 | -- | -- |
-| Medium | 3 | 3 | 0 |
-| Low | 3 | 2 | 1 |
-| Informational | 5 | 0 | 5 |
+| Medium | 2 | 1 | 1 |
+| Low | 3 | 3 | 0 |
+| Informational | 3 | 0 | 3 |
 
 **All medium and fixable low findings have been remediated.** See `docs/AUDIT-REPORT.md` and `docs/DEEP-AUDIT-REPORT.md` for full details.
 

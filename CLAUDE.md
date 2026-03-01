@@ -21,10 +21,10 @@
 
 ```
 src/
-  LaneVault4626.sol          -- Core vault (617 LOC): ERC-4626 + 5-bucket accounting
-  LaneQueueManager.sol       -- FIFO redemption queue (92 LOC): non-cancelable
-  LaneSettlementAdapter.sol  -- CCIP receiver (105 LOC): replay + domain binding
-  LaneVaultScaffold.sol      -- Simulation scaffold (228 LOC): not deployed
+  LaneVault4626.sol          -- Core vault (616 LOC): ERC-4626 + 5-bucket accounting
+  LaneQueueManager.sol       -- FIFO redemption queue (91 LOC): non-cancelable
+  LaneSettlementAdapter.sol  -- CCIP receiver (104 LOC): replay + domain binding
+  LaneVaultScaffold.sol      -- Simulation scaffold (227 LOC): not deployed
 
 test/
   LaneVault4626.t.sol                    -- Core vault tests (8)

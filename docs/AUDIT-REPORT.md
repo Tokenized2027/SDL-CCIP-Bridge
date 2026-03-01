@@ -2,7 +2,7 @@
 
 **Auditor:** Claude (SC Auditor — Enhanced 9-Phase Methodology)
 **Date:** 2026-03-01
-**Scope:** `contracts/layer7-vault/src/` (4 files, 766 nSLOC)
+**Scope:** `src/` (4 files, 766 nSLOC)
 **Solidity:** 0.8.24
 **Framework:** Foundry (forge 1.5.1)
 **Fuzz Iterations:** 10,000 runs per test
@@ -40,7 +40,7 @@ The LaneVault4626 suite implements an ERC-4626 LP vault for cross-chain bridge l
 | Low      | 3     | 3     | —            |
 | Info     | 3     | —     | 3            |
 
-**Overall Assessment:** The codebase is well-structured with strong accounting invariants enforced inline. No critical or high-severity issues were found. Two medium findings were identified: one (missing reservation expiry enforcement) was fixed with a new `expireReservation()` function; the other (phantom value from settlement fee income) is an intentional architectural decision documented as acknowledged. All 39 tests pass at 10,000 fuzz iterations including 2.88M invariant assertions.
+**Overall Assessment:** The codebase is well-structured with strong accounting invariants enforced inline. No critical or high-severity issues were found. Two medium findings were identified: one (missing reservation expiry enforcement) was fixed with a new `expireReservation()` function; the other (phantom value from settlement fee income) is an intentional architectural decision documented as acknowledged. All 39 tests pass at 10,000 fuzz iterations including 2.88M invariant assertions. (Post-audit deep re-audit added 11 more tests — see [DEEP-AUDIT-REPORT.md](./DEEP-AUDIT-REPORT.md) for the 50-test total.)
 
 ---
 
@@ -306,8 +306,6 @@ The enhanced invariant harness uses 6 action types drawn uniformly:
 | `maxUtilizationBps` | 0–10000 | At 10000: LP can't withdraw until settlements complete. At 0: no bridge operations possible. |
 | `protocolFeeBps` | 0–10000 | At 10000: 100% of fee income goes to protocol, LPs get nothing from fees. Not fund-draining (fees are capped by income). |
 | `badDebtReserveBps` | 0–10000 | At 10000: all free liquidity reserved for bad debt. Reduces withdrawable amount but doesn't lose funds. |
-| `minDepositAssets` | 0–uint256.max | At max: deposits impossible. At 0: dust deposits allowed (mitigated by decimals offset). |
-| `minRedeemShares` | 0–uint256.max | At max: redemptions impossible. At 0: dust redemptions (gas cost is natural deterrent). |
 
 ### 8.3 Worst-Case Loss Scenario
 
@@ -365,7 +363,9 @@ Cross-referenced against known DeFi exploits and common vulnerability patterns:
 | `LaneVault4626.EnhancedInvariants.t.sol` | 1 | Invariant (48 actions, 6 invariants) | 10,000 |
 | `LaneSettlementAdapter.t.sol` | 6 | Unit + integration | — |
 | `LaneVaultScaffold.t.sol` | 5 | Unit | — |
-| **Total** | **39** | | |
+| **Total (Phase 1)** | **39** | | |
+
+> **Note:** The deep re-audit ([DEEP-AUDIT-REPORT.md](./DEEP-AUDIT-REPORT.md)) added 11 additional tests (DeepAudit.t.sol), bringing the current total to **50 tests** across 8 files.
 
 ### 11.2 Fuzz Statistics (10K Runs)
 
@@ -384,7 +384,7 @@ Cross-referenced against known DeFi exploits and common vulnerability patterns:
 ### 11.3 Final Test Run
 
 ```
-39 tests passed, 0 failed, 0 skipped
+39 tests passed, 0 failed, 0 skipped (Phase 1; current total with deep audit: 50)
 Total wall time: 93.64s (132.39s CPU)
 ```
 

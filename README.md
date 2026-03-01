@@ -34,12 +34,12 @@ The SDL CCIP Bridge is a non-upgradeable smart contract system that manages liqu
 
 ## Contracts
 
-| Contract | nSLOC | Description |
-|----------|-------|-------------|
-| [`LaneVault4626`](src/LaneVault4626.sol) | 617 | Core ERC-4626 vault with 5-bucket liquidity accounting, dual state machines, FIFO redemption queue, and role-based access control |
-| [`LaneQueueManager`](src/LaneQueueManager.sol) | 92 | Immutable FIFO redemption queue with strict no-cancel policy |
-| [`LaneSettlementAdapter`](src/LaneSettlementAdapter.sol) | 105 | Chainlink CCIP receiver with source allowlist, 3-tuple replay protection, and payload domain binding |
-| [`LaneVaultScaffold`](src/LaneVaultScaffold.sol) | 228 | Off-chain simulation parity contract (mirrors Python invariant model, not deployed on-chain) |
+| Contract | LOC | Description |
+|----------|-----|-------------|
+| [`LaneVault4626`](src/LaneVault4626.sol) | 616 | Core ERC-4626 vault with 5-bucket liquidity accounting, dual state machines, FIFO redemption queue, and role-based access control |
+| [`LaneQueueManager`](src/LaneQueueManager.sol) | 91 | Immutable FIFO redemption queue with strict no-cancel policy |
+| [`LaneSettlementAdapter`](src/LaneSettlementAdapter.sol) | 104 | Chainlink CCIP receiver with source allowlist, 3-tuple replay protection, and payload domain binding |
+| [`LaneVaultScaffold`](src/LaneVaultScaffold.sol) | 227 | Off-chain simulation parity contract (mirrors Python invariant model, not deployed on-chain) |
 
 ## Architecture
 
