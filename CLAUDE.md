@@ -12,7 +12,7 @@
 2. **OpenZeppelin version is `5.0.2`** -- do not upgrade without explicit approval
 3. **No proxy patterns** -- contracts are immutable by design
 4. **All state-mutating functions must have `nonReentrant`** -- no exceptions
-5. **Run `forge test -vv` before any commit** -- all 50 tests must pass
+5. **Run `forge test -vv` before any commit** -- all 60 tests must pass
 6. **Run `forge fmt --check` before any commit** -- formatting must be clean
 7. **Never modify `_assertAccountingInvariants()` without adding corresponding test coverage**
 8. **Conventional commits:** `feat:`, `fix:`, `docs:`, `chore:`, `test:`
@@ -32,6 +32,7 @@ test/
   LaneVault4626Invariant.t.sol           -- State machine invariants (1)
   LaneVault4626.EnhancedInvariants.t.sol -- 6-invariant fuzz (1)
   LaneVault4626.Attacks.t.sol            -- Attack scenarios (14)
+  SecurityAudit.Attacks.t.sol            -- E2E security audit attacks (10): ATK-B01 to B10
   LaneSettlementAdapter.t.sol            -- Adapter tests (6)
   LaneVaultScaffold.t.sol                -- Scaffold tests (5)
   DeepAudit.t.sol                        -- Deep audit tests (11)
