@@ -46,7 +46,7 @@ free liquidity, reserved, in-flight, bad debt reserve, and protocol fees.
 
 On top of the vault, we built three Chainlink CRE workflows.
 
-CRE is Chainlink's Compute Runtime Environment.
+CRE is Chainlink's Runtime Environment.
 Think of it as a decentralized server
 running across Chainlink's oracle network.
 

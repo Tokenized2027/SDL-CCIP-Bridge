@@ -98,7 +98,7 @@ When an LP wants to withdraw but there isn't enough free liquidity, they join a 
 
 ### What is CRE?
 
-CRE stands for **Compute Runtime Environment**. It's Chainlink's framework for running custom programs across their decentralized oracle network. Think of it as a server that nobody controls: your code runs on multiple oracle nodes, and they all have to agree on the result.
+CRE stands for **Chainlink Runtime Environment**. It's Chainlink's framework for running custom programs across their decentralized oracle network. Think of it as a server that nobody controls: your code runs on multiple oracle nodes, and they all have to agree on the result.
 
 ### Workflow 1: Vault Health Monitor (every 15 minutes)
 
