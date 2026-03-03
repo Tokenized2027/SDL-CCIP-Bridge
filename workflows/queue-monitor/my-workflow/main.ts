@@ -116,11 +116,12 @@ type QueueMonitorOutput = {
 // Helpers
 // ---------------------------------------------------------------------------
 
-function getEvmClient(chainName: string, isTestnet = false) {
+function getEvmClient(chainName: string, isTestnet?: boolean) {
+	const testnet = isTestnet ?? chainName.includes('testnet');
 	const net = getNetwork({
 		chainFamily: 'evm',
 		chainSelectorName: chainName,
-		isTestnet,
+		isTestnet: testnet,
 	});
 	if (!net) throw new Error(`Network not found: ${chainName}`);
 	return new cre.capabilities.EVMClient(net.chainSelector.selector);

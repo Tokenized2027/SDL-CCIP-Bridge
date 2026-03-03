@@ -41,7 +41,8 @@ test/
   mocks/MockERC20.sol                    -- Test mock
 
 script/
-  Deploy.s.sol               -- Deployment script (deploys paused)
+  Deploy.s.sol               -- Production deployment (deploys paused, requires real LINK)
+  DeployDemo.s.sol           -- Demo deployment (MockERC20 + vault + adapter + 50k deposit)
 
 workflows/                   -- CRE autonomous monitoring (3 workflows)
   vault-health/              -- 5-bucket monitoring + risk classification
@@ -52,9 +53,11 @@ scripts/                     -- Orchestration & proof writing
   bridge-unified-cycle.sh    -- Phase 1 + 1.5 + 2 orchestration
   record-bridge-proofs.mjs   -- On-chain proof writes to Sepolia
   composite-bridge-intelligence.mjs -- Cross-workflow correlation
+  read-vault-state.sh        -- Read all vault state from Sepolia via cast
+  simulate-bridge-lifecycle.sh -- Full bridge lifecycle simulation
 
 platform/
-  bridge_analyze_endpoint.py -- Flask AI analysis server (GPT-5.3-Codex)
+  bridge_analyze_endpoint.py -- Flask AI analysis server (GPT-4o)
 
 docs/
   WHITEPAPER.md              -- Technical whitepaper
@@ -67,13 +70,28 @@ docs/
   submission.md              -- Hackathon submission
 ```
 
+## Sepolia Deployment (Demo Vault)
+
+| Contract | Address |
+|----------|---------|
+| MockERC20 (mLINK) | `0xf59f724C38BdDe189DEe900aD05305ca007161ed` |
+| Demo Vault | `0x5962FBf9EA3398400869c91f1B39860264d6dB24` |
+| Demo Adapter | `0x88D335531431FecEBFF8619AFF0c2F28Fd3477C1` |
+| Demo Queue | `0xC40Ad4387B75D5BA8BF90b2ce35Ba0062b53aC9B` |
+| SentinelRegistry (shared) | `0xE5B1b708b237F9F0F138DE7B03EEc1Eb1a871d40` |
+| Deployer/Owner | `0xB250152756E2d6E3bD237a6875aE5E26e3D3877b` |
+
+State: vault has 50,200 mLINK TVL, one completed bridge lifecycle simulation (reserve + fill + settle), 20 mLINK bad debt reserve, 4 proof hashes on-chain.
+
 ## CRE Workflow Rules
 
 9. **Workflow isolation:** each workflow is a standalone CRE project with own `package.json`, `node_modules`, config, and ABIs. No shared state between workflows at runtime.
 10. **CRE SDK patterns:** Use `consensusIdenticalAggregation` for all HTTPClient calls. Use `encodeCallMsg` for all EVMClient calls. Use `getNetwork` for chain resolution. Use `CronCapability` for scheduling.
 11. **Proof hashes are immutable.** Once a `snapshotHash` is written on-chain, it cannot be altered. The hash encoding must stay consistent across TypeScript and Solidity.
-12. **AI analysis costs money.** The Flask endpoint uses GPT-5.3-Codex (~$0.003-0.005/call). Every workflow simulation that hits this endpoint costs API credits.
+12. **AI analysis costs money.** The Flask endpoint uses GPT-4o (~$0.003-0.005/call). Every workflow simulation that hits this endpoint costs API credits.
 13. **Use Bun for workflows, not npm.** Install deps: `cd workflows/<name>/my-workflow && bun install`
+15. **CRE 15-read limit per workflow.** Each workflow execution gets max 15 EVMClient calls. Vault-health and bridge-ai-advisor are trimmed to 11 reads each (4 buckets + 2 totals + 2 policy + 1 pause + 1 queue + 1 price). Do NOT add reads without removing others.
+16. **Testnet chain resolution.** `getNetwork()` requires `isTestnet: true` for testnet chains. All workflows auto-detect via `chainName.includes('testnet')`.
 14. **CHAINLINK.md must be updated** if any Chainlink touchpoint changes.
 
 ## Key Concepts

@@ -2,9 +2,11 @@
  * Vault Health CRE Workflow
  *
  * Monitors LaneVault4626 liquidity state via EVMClient reads.
- * Reads all 5 accounting buckets, policy parameters, pause flags,
+ * Reads core accounting buckets, key policy parameters, pause flag,
  * queue depth, and asset price from Chainlink Data Feed.
  * Classifies vault risk and writes proof hash to SentinelRegistry on Sepolia.
+ *
+ * NOTE: CRE imposes a 15-read limit per workflow. We use 11 reads + 1 write = 12 total.
  *
  * Chainlink products used:
  *   - CRE SDK (Runner, handler, CronCapability)
@@ -67,7 +69,7 @@ const configSchema = z.object({
 type Config = z.infer<typeof configSchema>;
 
 // ---------------------------------------------------------------------------
-// Output types
+// Output types (trimmed for CRE 15-read budget)
 // ---------------------------------------------------------------------------
 
 type BucketSnapshot = {
@@ -75,27 +77,17 @@ type BucketSnapshot = {
 	reservedLiquidityAssets: string;
 	inFlightLiquidityAssets: string;
 	badDebtReserveAssets: string;
-	protocolFeeAccruedAssets: string;
-	settledFeesEarnedAssets: string;
-	realizedNavLossAssets: string;
 	totalAssets: string;
 	totalSupply: string;
-	availableForLP: string;
 };
 
 type PolicySnapshot = {
 	maxUtilizationBps: number;
 	badDebtReserveCutBps: number;
-	targetHotReserveBps: number;
-	protocolFeeBps: number;
-	protocolFeeCapBps: number;
-	emergencyReleaseDelay: number;
 };
 
 type PauseSnapshot = {
 	globalPaused: boolean;
-	depositPaused: boolean;
-	reservePaused: boolean;
 };
 
 type HealthMetrics = {
@@ -121,11 +113,12 @@ type VaultHealthOutput = {
 // Helpers
 // ---------------------------------------------------------------------------
 
-function getEvmClient(chainName: string, isTestnet = false) {
+function getEvmClient(chainName: string, isTestnet?: boolean) {
+	const testnet = isTestnet ?? chainName.includes('testnet');
 	const net = getNetwork({
 		chainFamily: 'evm',
 		chainSelectorName: chainName,
-		isTestnet,
+		isTestnet: testnet,
 	});
 	if (!net) throw new Error(`Network not found: ${chainName}`);
 	return new cre.capabilities.EVMClient(net.chainSelector.selector);
@@ -210,7 +203,7 @@ const safeJsonStringify = (obj: unknown) =>
 	JSON.stringify(obj, (_, v) => (typeof v === 'bigint' ? v.toString() : v), 2);
 
 // ---------------------------------------------------------------------------
-// Readers
+// Readers (11 reads total, within CRE 15-read limit)
 // ---------------------------------------------------------------------------
 
 function readBuckets(
@@ -219,16 +212,13 @@ function readBuckets(
 ): BucketSnapshot {
 	const vault = runtime.config.vaultAddress;
 
+	// 4 core buckets + 2 totals = 6 reads
 	const free = readUint256(runtime, evmClient, vault, 'freeLiquidityAssets');
 	const reserved = readUint256(runtime, evmClient, vault, 'reservedLiquidityAssets');
 	const inFlight = readUint256(runtime, evmClient, vault, 'inFlightLiquidityAssets');
 	const badDebt = readUint256(runtime, evmClient, vault, 'badDebtReserveAssets');
-	const protocolFee = readUint256(runtime, evmClient, vault, 'protocolFeeAccruedAssets');
-	const settledFees = readUint256(runtime, evmClient, vault, 'settledFeesEarnedAssets');
-	const navLoss = readUint256(runtime, evmClient, vault, 'realizedNavLossAssets');
 	const total = readUint256(runtime, evmClient, vault, 'totalAssets');
 	const supply = readUint256(runtime, evmClient, vault, 'totalSupply');
-	const availableLP = readUint256(runtime, evmClient, vault, 'availableFreeLiquidityForLP');
 
 	const dec = runtime.config.assetDecimals;
 	runtime.log(
@@ -240,12 +230,8 @@ function readBuckets(
 		reservedLiquidityAssets: reserved.toString(),
 		inFlightLiquidityAssets: inFlight.toString(),
 		badDebtReserveAssets: badDebt.toString(),
-		protocolFeeAccruedAssets: protocolFee.toString(),
-		settledFeesEarnedAssets: settledFees.toString(),
-		realizedNavLossAssets: navLoss.toString(),
 		totalAssets: total.toString(),
 		totalSupply: supply.toString(),
-		availableForLP: availableLP.toString(),
 	};
 }
 
@@ -255,24 +241,15 @@ function readPolicy(
 ): PolicySnapshot {
 	const vault = runtime.config.vaultAddress;
 
+	// 2 policy reads (only those needed for risk classification)
 	const maxUtil = readUint16(runtime, evmClient, vault, 'maxUtilizationBps');
 	const reserveCut = readUint16(runtime, evmClient, vault, 'badDebtReserveCutBps');
-	const hotReserve = readUint16(runtime, evmClient, vault, 'targetHotReserveBps');
-	const protoFee = readUint16(runtime, evmClient, vault, 'protocolFeeBps');
-	const protoCap = readUint16(runtime, evmClient, vault, 'protocolFeeCapBps');
-	const emergencyDelay = readUint16(runtime, evmClient, vault, 'emergencyReleaseDelay');
 
-	runtime.log(
-		`Policy | maxUtil=${maxUtil}bps reserveCut=${reserveCut}bps hotReserve=${hotReserve}bps protoFee=${protoFee}bps delay=${emergencyDelay}s`,
-	);
+	runtime.log(`Policy | maxUtil=${maxUtil}bps reserveCut=${reserveCut}bps`);
 
 	return {
 		maxUtilizationBps: maxUtil,
 		badDebtReserveCutBps: reserveCut,
-		targetHotReserveBps: hotReserve,
-		protocolFeeBps: protoFee,
-		protocolFeeCapBps: protoCap,
-		emergencyReleaseDelay: emergencyDelay,
 	};
 }
 
@@ -282,13 +259,12 @@ function readPauseState(
 ): PauseSnapshot {
 	const vault = runtime.config.vaultAddress;
 
+	// 1 pause read (global only, most critical)
 	const global = readBool(runtime, evmClient, vault, 'globalPaused');
-	const deposit = readBool(runtime, evmClient, vault, 'depositPaused');
-	const reserve = readBool(runtime, evmClient, vault, 'reservePaused');
 
-	runtime.log(`Pause | global=${global} deposit=${deposit} reserve=${reserve}`);
+	runtime.log(`Pause | global=${global}`);
 
-	return { globalPaused: global, depositPaused: deposit, reservePaused: reserve };
+	return { globalPaused: global };
 }
 
 function readQueueDepth(
@@ -296,6 +272,7 @@ function readQueueDepth(
 	evmClient: ReturnType<typeof getEvmClient>,
 ): number {
 	const qm = runtime.config.queueManagerAddress;
+	// 1 queue read
 	const callData = encodeFunctionData({
 		abi: LaneQueueManager,
 		functionName: 'pendingCount',
@@ -318,6 +295,7 @@ function readLinkUsd(
 	const feedAddr = runtime.config.linkUsdFeedAddress;
 	if (!feedAddr) return 0;
 
+	// 1 price read
 	try {
 		const callData = encodeFunctionData({
 			abi: PriceFeedAggregator,
@@ -344,7 +322,6 @@ function readLinkUsd(
 
 function classifyRisk(
 	buckets: BucketSnapshot,
-	policy: PolicySnapshot,
 	paused: PauseSnapshot,
 	queueDepth: number,
 	thresholds: Config['thresholds'],
@@ -358,7 +335,6 @@ function classifyRisk(
 		queueCriticalCount: thresholds?.queueCriticalCount ?? 20,
 	};
 
-	// Paused = immediate critical
 	if (paused.globalPaused) return { risk: 'critical', signal: 'Global pause active' };
 
 	const totalAssets = BigInt(buckets.totalAssets);
@@ -366,43 +342,32 @@ function classifyRisk(
 	const inFlight = BigInt(buckets.inFlightLiquidityAssets);
 	const badDebt = BigInt(buckets.badDebtReserveAssets);
 
-	// Utilization = (reserved + inFlight) / totalAssets
 	const utilizationBps =
 		totalAssets > 0n ? Number(((reserved + inFlight) * 10000n) / totalAssets) : 0;
-
-	// Bad debt reserve ratio = badDebt / totalAssets
 	const reserveRatio = totalAssets > 0n ? Number(badDebt) / Number(totalAssets) : 0;
 
 	const signals: string[] = [];
 
-	// Check utilization
 	if (utilizationBps >= t.utilizationCriticalBps) {
 		signals.push(`Utilization critical: ${utilizationBps}bps >= ${t.utilizationCriticalBps}bps`);
 	} else if (utilizationBps >= t.utilizationWarningBps) {
 		signals.push(`Utilization warning: ${utilizationBps}bps >= ${t.utilizationWarningBps}bps`);
 	}
 
-	// Check reserve health
 	if (reserveRatio < t.reserveCriticalRatio && totalAssets > 0n) {
 		signals.push(`Reserve critical: ${(reserveRatio * 100).toFixed(2)}% < ${t.reserveCriticalRatio * 100}%`);
 	} else if (reserveRatio < t.reserveWarningRatio && totalAssets > 0n) {
 		signals.push(`Reserve warning: ${(reserveRatio * 100).toFixed(2)}% < ${t.reserveWarningRatio * 100}%`);
 	}
 
-	// Check queue
 	if (queueDepth >= t.queueCriticalCount) {
 		signals.push(`Queue critical: ${queueDepth} pending >= ${t.queueCriticalCount}`);
 	} else if (queueDepth >= t.queueWarningCount) {
 		signals.push(`Queue warning: ${queueDepth} pending >= ${t.queueWarningCount}`);
 	}
 
-	// Check pause flags (not global but partial)
-	if (paused.depositPaused) signals.push('Deposits paused');
-	if (paused.reservePaused) signals.push('Reserves paused');
-
-	// Determine overall risk
-	const hasCritical = signals.some((s) => s.includes('critical') || s.includes('Global'));
-	const hasWarning = signals.some((s) => s.includes('warning') || s.includes('paused'));
+	const hasCritical = signals.some((s) => s.includes('critical'));
+	const hasWarning = signals.some((s) => s.includes('warning'));
 
 	const risk = hasCritical ? 'critical' : hasWarning ? 'warning' : 'ok';
 	const signal = signals.length > 0 ? signals.join('; ') : 'All systems nominal';
@@ -412,12 +377,15 @@ function classifyRisk(
 
 // ---------------------------------------------------------------------------
 // Cron handler
+// Read budget: 6 (buckets) + 2 (policy) + 1 (pause) + 1 (queue) + 1 (price) = 11 reads
+// Write budget: 1 (registry) = 1 write
+// Total: 12 operations (within CRE 15-call limit)
 // ---------------------------------------------------------------------------
 
 function onCron(runtime: Runtime<Config>, _payload: CronPayload): string {
 	const evmClient = getEvmClient(runtime.config.chainName);
 
-	// Phase 1: Read vault state
+	// Phase 1: Read vault state (11 reads)
 	const buckets = readBuckets(runtime, evmClient);
 	const policy = readPolicy(runtime, evmClient);
 	const paused = readPauseState(runtime, evmClient);
@@ -449,7 +417,7 @@ function onCron(runtime: Runtime<Config>, _payload: CronPayload): string {
 	};
 
 	// Phase 3: Classify risk
-	const { risk, signal } = classifyRisk(buckets, policy, paused, queueDepth, runtime.config.thresholds);
+	const { risk, signal } = classifyRisk(buckets, paused, queueDepth, runtime.config.thresholds);
 	runtime.log(`Risk | vault:${risk} | ${signal}`);
 
 	const output: VaultHealthOutput = {
@@ -462,7 +430,7 @@ function onCron(runtime: Runtime<Config>, _payload: CronPayload): string {
 		timestamp: new Date().toISOString(),
 	};
 
-	// Phase 4: On-chain proof write to SentinelRegistry (Sepolia)
+	// Phase 4: On-chain proof write to SentinelRegistry (1 write)
 	if (
 		runtime.config.registry?.address &&
 		runtime.config.registry.address !== zeroAddress
@@ -470,7 +438,6 @@ function onCron(runtime: Runtime<Config>, _payload: CronPayload): string {
 		try {
 			const sepoliaClient = getEvmClient(runtime.config.registry.chainName, true);
 			const timestampUnix = BigInt(Math.floor(Date.now() / 1000));
-			// Hash uses raw values (no decimal division) to match record-bridge-proofs.mjs
 			const snapshotHash = keccak256(
 				encodeAbiParameters(
 					parseAbiParameters(

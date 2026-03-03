@@ -6,7 +6,7 @@ Two endpoints:
   POST /api/cre/analyze-bridge       - Single vault state analysis (bridge-ai-advisor workflow)
   POST /api/cre/analyze-bridge-composite - Cross-workflow composite analysis
 
-Uses OpenAI GPT-5.3-Codex for structured analysis (~$0.003-0.005/call).
+Uses OpenAI GPT-4o for structured analysis (~$0.003-0.005/call).
 
 Setup:
     pip install flask openai
@@ -29,6 +29,17 @@ if not CRE_SECRET:
     app.logger.warning("CRE_SECRET not set: all requests will be accepted without auth")
 
 
+def _strip_nulls(obj):
+    """Recursively replace None/null with 0 (CRE consensus can't serialize null)."""
+    if isinstance(obj, dict):
+        return {k: _strip_nulls(v) for k, v in obj.items()}
+    if isinstance(obj, list):
+        return [_strip_nulls(v) for v in obj]
+    if obj is None:
+        return 0
+    return obj
+
+
 def verify_cre_secret(req):
     """Verify X-CRE-Secret header if CRE_SECRET is set."""
     if not CRE_SECRET:
@@ -39,7 +50,7 @@ def verify_cre_secret(req):
 def analyze_vault_state(vault_state: dict) -> dict:
     """
     Analyze vault state and produce policy recommendations.
-    Uses GPT-5.3-Codex for structured risk assessment.
+    Uses GPT-4o for structured risk assessment.
     """
     if not OPENAI_API_KEY:
         return heuristic_analysis(vault_state)
@@ -62,22 +73,24 @@ Vault State:
 - LINK/USD: ${vault_state.get('linkUsd', 0):.2f}
 - Current policy: maxUtil={vault_state.get('maxUtilBps', 6000)}bps, reserveCut={vault_state.get('reserveCutBps', 1000)}bps, hotReserve={vault_state.get('hotReserveBps', 2000)}bps
 
+IMPORTANT: Never use null in the response. Use 0 to mean "no change recommended".
+
 Respond with ONLY valid JSON (no markdown, no explanation outside JSON):
 {{
-  "risk": "ok|warning|critical",
+  "risk": "ok or warning or critical",
   "recommendation": "one-sentence summary",
   "suggestedActions": ["action1", "action2"],
   "policyAdjustments": {{
-    "maxUtilizationBps": null_or_number,
-    "badDebtReserveCutBps": null_or_number,
-    "targetHotReserveBps": null_or_number
+    "maxUtilizationBps": 0,
+    "badDebtReserveCutBps": 0,
+    "targetHotReserveBps": 0
   }},
   "confidence": 0.0_to_1.0,
   "reasoning": "brief reasoning"
 }}"""
 
         response = client.chat.completions.create(
-            model="gpt-5.3-codex",
+            model="gpt-4o",
             max_tokens=500,
             messages=[{"role": "user", "content": prompt}],
         )
@@ -88,7 +101,9 @@ Respond with ONLY valid JSON (no markdown, no explanation outside JSON):
             text = text.split("\n", 1)[1]
             if text.endswith("```"):
                 text = text[:-3]
-        return json.loads(text)
+        result = json.loads(text)
+        # CRE consensus cannot serialize null values, replace with 0
+        return _strip_nulls(result)
 
     except Exception as e:
         app.logger.warning(f"AI analysis failed, using heuristic: {e}")
@@ -173,7 +188,7 @@ Respond with ONLY valid JSON:
 }}"""
 
         response = client.chat.completions.create(
-            model="gpt-5.3-codex",
+            model="gpt-4o",
             max_tokens=300,
             messages=[{"role": "user", "content": prompt}],
         )

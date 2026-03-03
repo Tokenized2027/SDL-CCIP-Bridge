@@ -58,30 +58,31 @@ import { cre, Runner, consensusIdenticalAggregation, getNetwork, encodeCallMsg }
 
 ### `workflows/vault-health/my-workflow/main.ts`
 
-Reads 15+ state variables from LaneVault4626 and LaneQueueManager:
+Reads 11 state variables from LaneVault4626 and LaneQueueManager (CRE 15-read limit per workflow):
 
 ```typescript
-// 5-bucket liquidity state
+// 4 core liquidity buckets (reads 1-4)
 evmClient.callContract(runtime, { call: encodeCallMsg({ to: vault, data: freeLiquidityAssets }) })
 evmClient.callContract(runtime, { call: encodeCallMsg({ to: vault, data: reservedLiquidityAssets }) })
 evmClient.callContract(runtime, { call: encodeCallMsg({ to: vault, data: inFlightLiquidityAssets }) })
 evmClient.callContract(runtime, { call: encodeCallMsg({ to: vault, data: badDebtReserveAssets }) })
-evmClient.callContract(runtime, { call: encodeCallMsg({ to: vault, data: protocolFeeAccruedAssets }) })
 
-// ERC-4626 standard
+// ERC-4626 totals (reads 5-6)
 evmClient.callContract(runtime, { call: encodeCallMsg({ to: vault, data: totalAssets }) })
 evmClient.callContract(runtime, { call: encodeCallMsg({ to: vault, data: totalSupply }) })
-evmClient.callContract(runtime, { call: encodeCallMsg({ to: vault, data: availableFreeLiquidityForLP }) })
 
-// Policy parameters
+// Policy parameters (reads 7-8)
 evmClient.callContract(runtime, { call: encodeCallMsg({ to: vault, data: maxUtilizationBps }) })
 evmClient.callContract(runtime, { call: encodeCallMsg({ to: vault, data: badDebtReserveCutBps }) })
 
-// Pause state
+// Pause state (read 9)
 evmClient.callContract(runtime, { call: encodeCallMsg({ to: vault, data: globalPaused }) })
 
-// Queue depth
+// Queue depth (read 10)
 evmClient.callContract(runtime, { call: encodeCallMsg({ to: queueManager, data: pendingCount }) })
+
+// LINK/USD price feed (read 11)
+evmClient.callContract(runtime, { call: encodeCallMsg({ to: linkUsdFeed, data: latestAnswer }) })
 ```
 
 ### `workflows/bridge-ai-advisor/my-workflow/main.ts`
@@ -133,7 +134,7 @@ const result = http
   .result();
 ```
 
-The AI endpoint (`platform/bridge_analyze_endpoint.py`) uses GPT-5.3-Codex to analyze vault state and recommend policy adjustments. All DON nodes must receive identical AI response before accepting it.
+The AI endpoint (`platform/bridge_analyze_endpoint.py`) uses GPT-4o to analyze vault state and recommend policy adjustments. All DON nodes must receive identical AI response before accepting it.
 
 Analysis produces:
 - Risk classification (`ok|warning|critical`)

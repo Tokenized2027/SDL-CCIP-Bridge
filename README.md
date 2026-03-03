@@ -203,6 +203,26 @@ forge script script/Deploy.s.sol --rpc-url $RPC_URL --broadcast --private-key $P
 
 The deployment script deploys both contracts **in paused state**. Operations must be explicitly unpaused after configuration is complete.
 
+### Demo Deployment (Sepolia)
+
+For testing without real LINK, use the demo deployment script which deploys a MockERC20 with unrestricted minting:
+
+```bash
+forge script script/DeployDemo.s.sol --rpc-url $RPC_URL --broadcast --private-key $PRIVATE_KEY
+```
+
+This deploys MockERC20 + LaneVault4626 + LaneSettlementAdapter, mints 100k tokens, deposits 50k, and leaves the vault **unpaused** for immediate testing.
+
+**Live Demo (Sepolia):**
+
+| Contract | Address |
+|----------|---------|
+| MockERC20 (mLINK) | `0xf59f724C38BdDe189DEe900aD05305ca007161ed` |
+| LaneVault4626 | `0x5962FBf9EA3398400869c91f1B39860264d6dB24` |
+| LaneSettlementAdapter | `0x88D335531431FecEBFF8619AFF0c2F28Fd3477C1` |
+| LaneQueueManager | `0xC40Ad4387B75D5BA8BF90b2ce35Ba0062b53aC9B` |
+| SentinelRegistry | `0xE5B1b708b237F9F0F138DE7B03EEc1Eb1a871d40` |
+
 ## Dependencies
 
 | Package | Version | Usage |
@@ -232,7 +252,7 @@ Three Chainlink CRE workflows provide autonomous, AI-powered monitoring of vault
 | Workflow | CRE Capabilities | Purpose |
 |----------|-------------------|---------|
 | **vault-health** | EVMClient, CronCapability, Data Feed | Reads all 5 liquidity buckets, policy params, pause state, queue depth, LINK/USD price. Classifies risk and writes proof hash to SentinelRegistry on Sepolia. |
-| **bridge-ai-advisor** | EVMClient, HTTPClient + Consensus, CronCapability | Reads vault state, calls AI analysis endpoint (GPT-5.3-Codex) with `consensusIdenticalAggregation` for policy optimization. Recommends parameter adjustments. |
+| **bridge-ai-advisor** | EVMClient, HTTPClient + Consensus, CronCapability | Reads vault state, calls AI analysis endpoint (GPT-4o) with `consensusIdenticalAggregation` for policy optimization. Recommends parameter adjustments. |
 | **queue-monitor** | EVMClient, CronCapability | Monitors FIFO redemption queue depth, liquidity coverage ratio, and wait times. Detects queue buildup before LPs get locked. |
 
 ### Architecture
@@ -258,7 +278,7 @@ Phase 2: On-Chain Proofs
 |---------|-------|
 | **CCIP** | Core settlement layer (CCIPReceiver, source allowlist, replay protection) |
 | **CRE SDK** | All 3 workflow definitions (Runner, handler, capabilities) |
-| **EVMClient** | 15+ vault contract reads per workflow run |
+| **EVMClient** | 11 vault contract reads per workflow (15 max per CRE execution) |
 | **Data Feeds** | LINK/USD price oracle for TVL calculation |
 | **HTTPClient** | AI policy analysis with consensus validation |
 | **CronCapability** | Autonomous scheduling (15-30 min intervals) |
@@ -293,7 +313,7 @@ scripts/
 └── composite-bridge-intelligence.mjs # Cross-workflow correlation
 
 platform/
-└── bridge_analyze_endpoint.py       # Flask AI analysis server (GPT-5.3-Codex)
+└── bridge_analyze_endpoint.py       # Flask AI analysis server (GPT-4o)
 
 intelligence/data/                   # Snapshot JSON output (gitignored)
 ```

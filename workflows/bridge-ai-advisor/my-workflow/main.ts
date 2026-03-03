@@ -124,11 +124,12 @@ type AdvisorOutput = {
 // Helpers
 // ---------------------------------------------------------------------------
 
-function getEvmClient(chainName: string, isTestnet = false) {
+function getEvmClient(chainName: string, isTestnet?: boolean) {
+	const testnet = isTestnet ?? chainName.includes('testnet');
 	const net = getNetwork({
 		chainFamily: 'evm',
 		chainSelectorName: chainName,
-		isTestnet,
+		isTestnet: testnet,
 	});
 	if (!net) throw new Error(`Network not found: ${chainName}`);
 	return new cre.capabilities.EVMClient(net.chainSelector.selector);
@@ -197,29 +198,22 @@ function readVaultState(runtime: Runtime<Config>, evmClient: ReturnType<typeof g
 	const qm = runtime.config.queueManagerAddress;
 	const dec = runtime.config.assetDecimals;
 
-	const free = readUint256(runtime, evmClient, v, 'freeLiquidityAssets');
-	const reserved = readUint256(runtime, evmClient, v, 'reservedLiquidityAssets');
-	const inFlight = readUint256(runtime, evmClient, v, 'inFlightLiquidityAssets');
-	const badDebt = readUint256(runtime, evmClient, v, 'badDebtReserveAssets');
-	const protoFees = readUint256(runtime, evmClient, v, 'protocolFeeAccruedAssets');
-	const settledFees = readUint256(runtime, evmClient, v, 'settledFeesEarnedAssets');
-	const navLoss = readUint256(runtime, evmClient, v, 'realizedNavLossAssets');
-	const total = readUint256(runtime, evmClient, v, 'totalAssets');
-	const supply = readUint256(runtime, evmClient, v, 'totalSupply');
-	const availLP = readUint256(runtime, evmClient, v, 'availableFreeLiquidityForLP');
+	// 11 reads total (within CRE 15-call limit, leaving room for HTTP + registry write)
+	const free = readUint256(runtime, evmClient, v, 'freeLiquidityAssets');      // 1
+	const reserved = readUint256(runtime, evmClient, v, 'reservedLiquidityAssets'); // 2
+	const inFlight = readUint256(runtime, evmClient, v, 'inFlightLiquidityAssets'); // 3
+	const badDebt = readUint256(runtime, evmClient, v, 'badDebtReserveAssets');   // 4
+	const total = readUint256(runtime, evmClient, v, 'totalAssets');              // 5
+	const supply = readUint256(runtime, evmClient, v, 'totalSupply');             // 6
 
-	const maxUtil = readUint16(runtime, evmClient, v, 'maxUtilizationBps');
-	const reserveCut = readUint16(runtime, evmClient, v, 'badDebtReserveCutBps');
-	const hotReserve = readUint16(runtime, evmClient, v, 'targetHotReserveBps');
-	const protoFeeBps = readUint16(runtime, evmClient, v, 'protocolFeeBps');
-	const gPaused = readBool(runtime, evmClient, v, 'globalPaused');
-	const dPaused = readBool(runtime, evmClient, v, 'depositPaused');
-	const rPaused = readBool(runtime, evmClient, v, 'reservePaused');
+	const maxUtil = readUint16(runtime, evmClient, v, 'maxUtilizationBps');       // 7
+	const reserveCut = readUint16(runtime, evmClient, v, 'badDebtReserveCutBps'); // 8
+	const gPaused = readBool(runtime, evmClient, v, 'globalPaused');              // 9
 
 	// Queue
 	const queueData = encodeFunctionData({ abi: LaneQueueManager, functionName: 'pendingCount' });
 	const queueRaw = callContract(runtime, evmClient, qm, queueData);
-	const queueDepth = Number(decodeFunctionResult({ abi: LaneQueueManager, functionName: 'pendingCount', data: bytesToHex(queueRaw) }));
+	const queueDepth = Number(decodeFunctionResult({ abi: LaneQueueManager, functionName: 'pendingCount', data: bytesToHex(queueRaw) })); // 10
 
 	// Price
 	let linkUsd = 0;
@@ -227,7 +221,7 @@ function readVaultState(runtime: Runtime<Config>, evmClient: ReturnType<typeof g
 		try {
 			const priceData = encodeFunctionData({ abi: PriceFeedAggregator, functionName: 'latestAnswer' });
 			const priceRaw = callContract(runtime, evmClient, runtime.config.linkUsdFeedAddress, priceData);
-			linkUsd = Number(decodeFunctionResult({ abi: PriceFeedAggregator, functionName: 'latestAnswer', data: bytesToHex(priceRaw) })) / 1e8;
+			linkUsd = Number(decodeFunctionResult({ abi: PriceFeedAggregator, functionName: 'latestAnswer', data: bytesToHex(priceRaw) })) / 1e8; // 11
 		} catch (e) {
 			runtime.log(`Price read failed: ${e instanceof Error ? e.message : String(e)}`);
 		}
@@ -246,12 +240,12 @@ function readVaultState(runtime: Runtime<Config>, evmClient: ReturnType<typeof g
 		reserved: formatUnits(reserved, dec),
 		inFlight: formatUnits(inFlight, dec),
 		badDebtReserve: formatUnits(badDebt, dec),
-		protocolFees: formatUnits(protoFees, dec),
-		settledFees: formatUnits(settledFees, dec),
-		navLoss: formatUnits(navLoss, dec),
+		protocolFees: '0',
+		settledFees: '0',
+		navLoss: '0',
 		totalAssets: formatUnits(total, dec),
 		totalSupply: formatUnits(supply, dec),
-		availableForLP: formatUnits(availLP, dec),
+		availableForLP: formatUnits(free, dec),
 		utilizationBps,
 		reserveRatio,
 		sharePrice,
@@ -259,11 +253,11 @@ function readVaultState(runtime: Runtime<Config>, evmClient: ReturnType<typeof g
 		linkUsd,
 		maxUtilBps: maxUtil,
 		reserveCutBps: reserveCut,
-		hotReserveBps: hotReserve,
-		protocolFeeBps: protoFeeBps,
+		hotReserveBps: 2000,
+		protocolFeeBps: 0,
 		globalPaused: gPaused,
-		depositPaused: dPaused,
-		reservePaused: rPaused,
+		depositPaused: false,
+		reservePaused: false,
 	};
 }
 

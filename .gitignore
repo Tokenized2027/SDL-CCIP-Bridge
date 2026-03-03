@@ -24,10 +24,15 @@ broadcast/
 lcov.info
 coverage/
 
+# Node modules (root + workflows)
+node_modules/
+bun.lock
+
 # CRE Workflows
 workflows/*/my-workflow/node_modules/
 workflows/*/my-workflow/dist/
 workflows/*/my-workflow/config.staging.json
+workflows/*/my-workflow/.cre_build_tmp.js
 intelligence/data/
 scripts/.last-bridge-write-state.json
 

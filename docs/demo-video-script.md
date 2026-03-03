@@ -58,7 +58,7 @@ It classifies the vault as OK, Warning, or Critical.
 
 The second is the AI advisor.
 It reads the same vault state,
-then sends it to a GPT-5.3-Codex model via HTTPClient.
+then sends it to a GPT-4o model via HTTPClient.
 
 Here's the key: the AI call uses `consensusIdenticalAggregation`.
 That means all DON nodes must get the same AI response
@@ -139,7 +139,7 @@ All coordinated through one SentinelRegistry contract.
 [SHOW: GitHub repo overview]
 
 Built with Solidity, TypeScript, Python, and viem.
-AI powered by GPT-5.3.
+AI powered by GPT-4o.
 766 lines of production Solidity. 83 tests. Triple audit.
 
 This isn't just a bridge vault.
