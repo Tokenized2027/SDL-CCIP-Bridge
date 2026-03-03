@@ -114,7 +114,7 @@ None -> Executed -> SettledSuccess
 
 ## Test Suite
 
-**50 tests passing** across 8 test files, including fuzz, invariant, and attack scenario coverage.
+**83 tests passing** across 11 test files, including fuzz, invariant, attack scenario, and full lifecycle E2E coverage.
 
 | File | Tests | Category |
 |------|-------|----------|
@@ -123,20 +123,24 @@ None -> Executed -> SettledSuccess
 | `LaneVault4626Invariant.t.sol` | 1 | 32-action state machine invariants |
 | `LaneVault4626.EnhancedInvariants.t.sol` | 1 | 48-action fuzz with 6 invariants (solvency, shares, queue, fees, assets, accounting) |
 | `LaneVault4626.Attacks.t.sol` | 14 | Attack scenarios: donation, reentrancy, replay, inflation, fake fills |
+| `SecurityAudit.Attacks.t.sol` | 10 | E2E security audit attacks (ATK-B01 to B10) |
 | `LaneSettlementAdapter.t.sol` | 6 | Adapter: source allowlist, replay, payload validation |
 | `LaneVaultScaffold.t.sol` | 5 | Scaffold: reserve cap, fee splits, loss absorption |
 | `DeepAudit.t.sol` | 11 | Deep audit: balance coverage, phantom assets, ERC-4626 compliance |
+| `AdvancedAudit.t.sol` | 15 | Advanced edge cases: ADV-01 to ADV-15 |
+| `E2E.t.sol` | 8 | Full lifecycle E2E: E2E-01 to E2E-08 |
 
 **Invariant coverage:** 4.16M assertions across 480K action sequences at audit-grade (10,000 fuzz runs).
 
 ## Security Audits
 
-Two independent audits completed. See [`docs/AUDIT-REPORT.md`](docs/AUDIT-REPORT.md) and [`docs/DEEP-AUDIT-REPORT.md`](docs/DEEP-AUDIT-REPORT.md).
+Three independent audits completed. See [`docs/AUDIT-REPORT.md`](docs/AUDIT-REPORT.md), [`docs/DEEP-AUDIT-REPORT.md`](docs/DEEP-AUDIT-REPORT.md), and [`docs/CRE-AI-ARCHITECTURE.md`](docs/CRE-AI-ARCHITECTURE.md).
 
 | Audit | Date | Findings | Status |
 |-------|------|----------|--------|
 | Phase 1 (9-phase methodology) | 2026-03-01 | 8 findings (2M, 3L, 3I) | All fixed or acknowledged |
 | Deep re-audit (cross-system) | 2026-03-01 | 11 CCIP-specific checks | All 4 actionable findings fixed |
+| CRE/AI security audit | 2026-03-03 | 10 findings (2C, 2H, 4M, 2L) | All fixed |
 
 ## Quick Start
 

@@ -61,6 +61,9 @@ docs/
   AUDIT-REPORT.md            -- Phase 1 audit (9-phase methodology)
   DEEP-AUDIT-REPORT.md       -- Deep re-audit (cross-system)
   CRE-AI-ARCHITECTURE.md     -- CRE & AI architecture (hackathon focus)
+  how-it-works.md            -- Plain language vault + CRE guide
+  verification.md            -- Trust model + proof verification guide
+  demo-video-script.md       -- 2:40 demo video script
   submission.md              -- Hackathon submission
 ```
 
