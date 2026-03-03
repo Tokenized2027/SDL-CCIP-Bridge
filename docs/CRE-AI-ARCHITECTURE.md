@@ -274,15 +274,23 @@ A dedicated security review of the CRE and AI components identified and fixed th
 
 ## Orchestration
 
+### Phase 1: CRE DON (Autonomous)
+
+All 3 workflows are deployed and active on the Chainlink Workflow Registry (Ethereum mainnet). The DON executes them autonomously via `CronCapability` every 15-30 minutes. No local cron needed for Phase 1.
+
 ### Unified Cycle (`scripts/bridge-unified-cycle.sh`)
 
-Runs all three phases in sequence, 7 times per day:
+Runs Phases 1.5 and 2 locally. Phase 1 runs on the CRE DON.
 
 ```
-Phase 1:    vault-health + bridge-ai-advisor + queue-monitor (parallel)
-Phase 1.5:  composite-bridge-intelligence (cross-correlation)
-Phase 2:    record-bridge-proofs (on-chain writes to Sepolia)
+Phase 1:    CRE DON (autonomous, on-chain cron)
+Phase 1.5:  composite-bridge-intelligence (local, needs cross-workflow data)
+Phase 2:    record-bridge-proofs (local, needs owner private key for SentinelRegistry)
 ```
+
+**Why Phases 1.5 and 2 run locally:**
+- CRE workflows are isolated by design (no shared state between workflows at runtime), so composite cross-correlation must happen outside the DON.
+- SentinelRegistry uses `onlyOwner` access control. The DON does not hold the owner's private key.
 
 ### Proof Recording (`scripts/record-bridge-proofs.mjs`)
 
@@ -368,7 +376,7 @@ platform/
   bridge_analyze_endpoint.py   # Flask AI server (GPT-5.2)
 
 scripts/
-  bridge-unified-cycle.sh      # Phase 1 + 1.5 + 2 orchestration
+  bridge-unified-cycle.sh      # Phase 1.5 + 2 orchestration (Phase 1 on CRE DON)
   record-bridge-proofs.mjs     # On-chain proof writes (viem + Sepolia)
   composite-bridge-intelligence.mjs  # Cross-workflow correlation
 ```

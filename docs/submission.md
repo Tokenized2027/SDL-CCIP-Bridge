@@ -33,7 +33,9 @@ SDL CCIP Bridge is an AI-powered ERC-4626 LP vault for cross-chain bridge liquid
 
 3. **Queue Monitor** tracks the FIFO redemption queue depth, liquidity coverage ratio, and individual request wait times. Detects queue buildup and liquidity crunch scenarios before LPs get locked.
 
-**Composite Intelligence (Phase 1.5):** After all 3 workflows complete, a cross-correlation script identifies ecosystem-level risks that no single workflow can see in isolation. High utilization alone might be fine, but high utilization + growing queue + AI advisor flagging = escalation.
+All 3 workflows are deployed and active on the Chainlink Workflow Registry (Ethereum mainnet). The DON executes them autonomously via CronCapability every 15-30 minutes.
+
+**Composite Intelligence (Phase 1.5):** After all 3 workflows complete, a local cross-correlation script identifies ecosystem-level risks that no single workflow can see in isolation. This runs locally because CRE workflows are isolated by design. High utilization alone might be fine, but high utilization + growing queue + AI advisor flagging = escalation.
 
 Every workflow run produces an immutable on-chain proof: a `HealthRecorded` event on the SentinelRegistry contract (Sepolia), containing the keccak256 hash of workflow-specific metrics. Risk levels use prefixed format (`vault:ok`, `advisor:warning`, `queue:critical`) so each proof is tagged with its source.
 

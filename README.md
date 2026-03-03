@@ -270,18 +270,23 @@ Three Chainlink CRE workflows provide autonomous, AI-powered monitoring of vault
 ### Architecture
 
 ```
-Phase 1: CRE Workflows (parallel, 7x/day)
+Phase 1: CRE DON (autonomous, on-chain cron)
   vault-health ──────┐
-  bridge-ai-advisor ──┤── EVMClient reads (free, no gas)
-  queue-monitor ──────┘── HTTPClient + AI (consensus)
+  bridge-ai-advisor ──┤── Runs on Chainlink DON every 15-30 min
+  queue-monitor ──────┘── EVMClient reads + HTTPClient AI (consensus)
          │
-Phase 1.5: Composite Intelligence
-  Cross-correlate all 3 snapshots
+         │  Workflows are live on Ethereum mainnet Workflow Registry.
+         │  DON nodes execute autonomously via CronCapability.
+         │
+Phase 1.5: Composite Intelligence (local script)
+  Cross-correlate all 3 workflow snapshots
   AI: ecosystem-aware risk assessment
+  Runs locally because CRE workflows are isolated by design.
          │
-Phase 2: On-Chain Proofs
+Phase 2: On-Chain Proofs (local script)
   keccak256 proof hashes → SentinelRegistry (Sepolia)
-  Immutable, verifiable audit trail
+  Runs locally because SentinelRegistry uses onlyOwner access control.
+  The DON does not hold the owner private key.
 ```
 
 ### Chainlink Products Used
@@ -320,7 +325,7 @@ workflows/
 └── queue-monitor/          # FIFO queue + liquidity coverage tracking
 
 scripts/
-├── bridge-unified-cycle.sh          # Phase 1 + 1.5 + 2 orchestration
+├── bridge-unified-cycle.sh          # Phase 1.5 + 2 orchestration (Phase 1 runs on CRE DON)
 ├── record-bridge-proofs.mjs         # On-chain proof writes to Sepolia
 └── composite-bridge-intelligence.mjs # Cross-workflow correlation
 

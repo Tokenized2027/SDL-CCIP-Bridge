@@ -50,7 +50,7 @@ workflows/                   -- CRE autonomous monitoring (3 workflows)
   queue-monitor/             -- FIFO queue + liquidity coverage tracking
 
 scripts/                     -- Orchestration & proof writing
-  bridge-unified-cycle.sh    -- Phase 1 + 1.5 + 2 orchestration
+  bridge-unified-cycle.sh    -- Phase 1.5 + 2 orchestration (Phase 1 runs on CRE DON)
   record-bridge-proofs.mjs   -- On-chain proof writes to Sepolia
   composite-bridge-intelligence.mjs -- Cross-workflow correlation
   read-vault-state.sh        -- Read all vault state from Sepolia via cast
