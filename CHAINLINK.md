@@ -212,6 +212,20 @@ The composite analysis optionally calls the AI endpoint for enhanced correlation
 
 ---
 
+## 10. Live CRE Workflow Registry (Ethereum Mainnet)
+
+All 3 workflows are registered on the Chainlink Workflow Registry contract at `0x4Ac54353FA4Fa961AfcC5ec4B118596d3305E7e5`:
+
+| Workflow | Workflow ID | Registration Tx |
+|----------|-------------|-----------------|
+| vault-health-staging | `004fe882fa92634fcb35f608fa94e76f635fb2f8e867d76328fe69e7f64d71d3` | `0x622162af...` |
+| bridge-ai-advisor-staging | `00460bc80aef935e416083628b1f00f82c1014f5dcc4e42f847832da2951911f` | `0xd9a942ff...` |
+| queue-monitor-staging | `00f900d3da87de6cb1b4bf3a7be2dd550e090f8bbb6a96841275307d20b61e72` | `0x3e1629cd...` |
+
+Each workflow was compiled to WASM, uploaded to `storage.cre.chain.link`, and registered via `UpsertWorkflow`. Owner: `0xB250152756E2d6E3bD237a6875aE5E26e3D3877b`.
+
+---
+
 ## Summary
 
 | Chainlink Product | Where Used |
@@ -226,3 +240,4 @@ The composite analysis optionally calls the AI endpoint for enhanced correlation
 | `SentinelRegistry.sol` (on-chain write) | All 3 workflows + composite intelligence + `scripts/record-bridge-proofs.mjs` |
 | `encodeCallMsg` | All 3 workflows |
 | Composite Intelligence (cross-workflow) | `scripts/composite-bridge-intelligence.mjs` |
+| Workflow Registry (UpsertWorkflow) | All 3 workflows registered on Ethereum mainnet |

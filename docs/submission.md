@@ -11,6 +11,7 @@
 | GitHub | https://github.com/Tokenized2027/SDL-CCIP-Bridge |
 | Chainlink Usage | https://github.com/Tokenized2027/SDL-CCIP-Bridge/blob/main/CHAINLINK.md |
 | Contract (Sepolia) | https://sepolia.etherscan.io/address/0xE5B1b708b237F9F0F138DE7B03EEc1Eb1a871d40 |
+| CRE Registry (Mainnet) | https://etherscan.io/address/0x4Ac54353FA4Fa961AfcC5ec4B118596d3305E7e5 |
 
 ---
 
@@ -42,7 +43,7 @@ Every workflow run produces an immutable on-chain proof: a `HealthRecorded` even
 
 - **Solidity 0.8.24** (Foundry): ERC-4626 vault with OpenZeppelin 5.0.2, Chainlink CCIP 1.6.1
 - **CRE TypeScript SDK** (`@chainlink/cre-sdk@^1.0.9`): all 3 workflows
-- **EVMClient.callContract()**: 15+ vault contract reads per workflow run
+- **EVMClient.callContract()**: 11 vault contract reads per workflow run (CRE 15-read limit)
 - **Chainlink Data Feed**: LINK/USD via latestAnswer() for TVL calculation
 - **HTTPClient + consensusIdenticalAggregation**: AI analysis with DON consensus
 - **CronCapability**: autonomous 15-30 minute scheduling
@@ -68,7 +69,8 @@ Every workflow run produces an immutable on-chain proof: a `HealthRecorded` even
 |---------|-------|
 | CCIP | Core settlement layer (CCIPReceiver, source allowlist, replay protection, domain binding) |
 | CRE SDK | All 3 workflow definitions (Runner, handler, CronCapability, EVMClient, HTTPClient) |
-| EVMClient | 15+ mainnet contract reads per workflow (vault buckets, policy, queue, pause state) |
+| EVMClient | 11 mainnet contract reads per workflow (vault buckets, policy, queue, pause state) |
+| Workflow Registry | All 3 workflows registered on Ethereum mainnet via UpsertWorkflow |
 | Data Feeds | LINK/USD price oracle (AggregatorV3 latestAnswer) |
 | HTTPClient | AI policy analysis with consensusIdenticalAggregation |
 | CronCapability | Autonomous scheduling (15-30 min intervals, 7x/day unified cycle) |
@@ -78,7 +80,7 @@ Every workflow run produces an immutable on-chain proof: a `HealthRecorded` even
 
 ## Challenges
 
-- Designing CRE workflows that read complex multi-contract vault state (5 buckets + queue + policy) within a single workflow run
-- Ensuring `consensusIdenticalAggregation` works with AI analysis responses (prompt engineering for deterministic output)
+- Designing CRE workflows that read complex multi-contract vault state (5 buckets + queue + policy) within the CRE 15-read limit per workflow execution
+- Ensuring `consensusIdenticalAggregation` works with AI analysis responses (null values crash CRE consensus, required server-side stripping + prompt engineering for deterministic output)
 - Cross-correlating data across 3 independent workflows in the composite intelligence phase
 - Balancing monitoring granularity with CRE execution costs (free reads, but API credits for AI)

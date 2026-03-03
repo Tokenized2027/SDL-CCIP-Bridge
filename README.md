@@ -243,6 +243,18 @@ Compiled with Solc 0.8.24 (emits `PUSH0`). Compatible with all Shanghai+ chains:
 | Base (Bedrock) | Yes | Compatible |
 | Sepolia | Yes | Compatible |
 
+## Live CRE Deployments (Ethereum Mainnet)
+
+All 3 CRE workflows are registered on the Chainlink Workflow Registry on Ethereum mainnet:
+
+| Workflow | Workflow ID | Etherscan |
+|----------|-------------|-----------|
+| vault-health | `004fe882...f64d71d3` | [tx](https://etherscan.io/tx/0x622162af5e1380dbeb71ec7ae2482e1f3d8e518c1c899bc7b102dc83d3012269) |
+| bridge-ai-advisor | `00460bc8...2951911f` | [tx](https://etherscan.io/tx/0xd9a942ffc080d140481e2920921b8e623573cdb528e47d7ce60ebe92cea9512e) |
+| queue-monitor | `00f900d3...0b61e72` | [tx](https://etherscan.io/tx/0x3e1629cd7401a6086784423118983fe9b31ce5e1f17b4f526a147f89fde94fb5) |
+
+Registry contract: [`0x4Ac54353FA4Fa961AfcC5ec4B118596d3305E7e5`](https://etherscan.io/address/0x4Ac54353FA4Fa961AfcC5ec4B118596d3305E7e5)
+
 ## CRE Integration: AI-Powered Autonomous Monitoring
 
 Three Chainlink CRE workflows provide autonomous, AI-powered monitoring of vault health with verifiable on-chain proofs. See [`CHAINLINK.md`](CHAINLINK.md) for every Chainlink touchpoint.

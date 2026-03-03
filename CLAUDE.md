@@ -83,6 +83,18 @@ docs/
 
 State: vault has 50,200 mLINK TVL, one completed bridge lifecycle simulation (reserve + fill + settle), 20 mLINK bad debt reserve, 4 proof hashes on-chain.
 
+## Live CRE Deployments (Ethereum Mainnet)
+
+All 3 workflows registered on the Chainlink Workflow Registry (`0x4Ac54353FA4Fa961AfcC5ec4B118596d3305E7e5`).
+
+| Workflow | Workflow ID | Tx Hash |
+|----------|-------------|---------|
+| vault-health | `004fe882fa92634fcb35f608fa94e76f635fb2f8e867d76328fe69e7f64d71d3` | `0x622162af5e1380dbeb71ec7ae2482e1f3d8e518c1c899bc7b102dc83d3012269` |
+| bridge-ai-advisor | `00460bc80aef935e416083628b1f00f82c1014f5dcc4e42f847832da2951911f` | `0xd9a942ffc080d140481e2920921b8e623573cdb528e47d7ce60ebe92cea9512e` |
+| queue-monitor | `00f900d3da87de6cb1b4bf3a7be2dd550e090f8bbb6a96841275307d20b61e72` | `0x3e1629cd7401a6086784423118983fe9b31ce5e1f17b4f526a147f89fde94fb5` |
+
+Owner: `0xB250152756E2d6E3bD237a6875aE5E26e3D3877b`. CRE user: `avi@stake.link` (FULL_ACCESS, ROOT).
+
 ## CRE Workflow Rules
 
 9. **Workflow isolation:** each workflow is a standalone CRE project with own `package.json`, `node_modules`, config, and ABIs. No shared state between workflows at runtime.

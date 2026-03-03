@@ -33,6 +33,7 @@ workflows/*/my-workflow/node_modules/
 workflows/*/my-workflow/dist/
 workflows/*/my-workflow/config.staging.json
 workflows/*/my-workflow/.cre_build_tmp.js
+workflows/*/my-workflow/binary.wasm.br.b64
 intelligence/data/
 scripts/.last-bridge-write-state.json
 
