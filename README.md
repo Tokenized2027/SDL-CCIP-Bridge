@@ -219,6 +219,81 @@ Compiled with Solc 0.8.24 (emits `PUSH0`). Compatible with all Shanghai+ chains:
 | Base (Bedrock) | Yes | Compatible |
 | Sepolia | Yes | Compatible |
 
+## CRE Integration: AI-Powered Autonomous Monitoring
+
+Three Chainlink CRE workflows provide autonomous, AI-powered monitoring of vault health with verifiable on-chain proofs. See [`CHAINLINK.md`](CHAINLINK.md) for every Chainlink touchpoint.
+
+### Workflows
+
+| Workflow | CRE Capabilities | Purpose |
+|----------|-------------------|---------|
+| **vault-health** | EVMClient, CronCapability, Data Feed | Reads all 5 liquidity buckets, policy params, pause state, queue depth, LINK/USD price. Classifies risk and writes proof hash to SentinelRegistry on Sepolia. |
+| **bridge-ai-advisor** | EVMClient, HTTPClient + Consensus, CronCapability | Reads vault state, calls AI analysis endpoint (Claude Haiku) with `consensusIdenticalAggregation` for policy optimization. Recommends parameter adjustments. |
+| **queue-monitor** | EVMClient, CronCapability | Monitors FIFO redemption queue depth, liquidity coverage ratio, and wait times. Detects queue buildup before LPs get locked. |
+
+### Architecture
+
+```
+Phase 1: CRE Workflows (parallel, 7x/day)
+  vault-health ──────┐
+  bridge-ai-advisor ──┤── EVMClient reads (free, no gas)
+  queue-monitor ──────┘── HTTPClient + AI (consensus)
+         │
+Phase 1.5: Composite Intelligence
+  Cross-correlate all 3 snapshots
+  AI: ecosystem-aware risk assessment
+         │
+Phase 2: On-Chain Proofs
+  keccak256 proof hashes → SentinelRegistry (Sepolia)
+  Immutable, verifiable audit trail
+```
+
+### Chainlink Products Used
+
+| Product | Usage |
+|---------|-------|
+| **CCIP** | Core settlement layer (CCIPReceiver, source allowlist, replay protection) |
+| **CRE SDK** | All 3 workflow definitions (Runner, handler, capabilities) |
+| **EVMClient** | 15+ vault contract reads per workflow run |
+| **Data Feeds** | LINK/USD price oracle for TVL calculation |
+| **HTTPClient** | AI policy analysis with consensus validation |
+| **CronCapability** | Autonomous scheduling (15-30 min intervals) |
+
+### Run Workflows
+
+```bash
+# Install deps (per workflow)
+cd workflows/vault-health/my-workflow && bun install
+
+# Simulate
+cd workflows/vault-health && ./run_snapshot.sh staging-settings
+
+# Run unified cycle (all 3 + composite + proofs)
+./scripts/bridge-unified-cycle.sh
+
+# Start AI analysis endpoint
+ANTHROPIC_API_KEY=... python platform/bridge_analyze_endpoint.py
+```
+
+### File Structure
+
+```
+workflows/
+├── vault-health/           # 5-bucket monitoring + risk classification
+├── bridge-ai-advisor/      # AI policy optimizer (HTTPClient + consensus)
+└── queue-monitor/          # FIFO queue + liquidity coverage tracking
+
+scripts/
+├── bridge-unified-cycle.sh          # Phase 1 + 1.5 + 2 orchestration
+├── record-bridge-proofs.mjs         # On-chain proof writes to Sepolia
+└── composite-bridge-intelligence.mjs # Cross-workflow correlation
+
+platform/
+└── bridge_analyze_endpoint.py       # Flask AI analysis server (Claude Haiku)
+
+intelligence/data/                   # Snapshot JSON output (gitignored)
+```
+
 ## License
 
 MIT

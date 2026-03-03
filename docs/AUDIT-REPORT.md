@@ -40,7 +40,7 @@ The LaneVault4626 suite implements an ERC-4626 LP vault for cross-chain bridge l
 | Low      | 3     | 3     | —            |
 | Info     | 3     | —     | 3            |
 
-**Overall Assessment:** The codebase is well-structured with strong accounting invariants enforced inline. No critical or high-severity issues were found. Two medium findings were identified: one (missing reservation expiry enforcement) was fixed with a new `expireReservation()` function; the other (phantom value from settlement fee income) is an intentional architectural decision documented as acknowledged. All 39 tests pass at 10,000 fuzz iterations including 2.88M invariant assertions. (Post-audit deep re-audit added 11 more tests — see [DEEP-AUDIT-REPORT.md](./DEEP-AUDIT-REPORT.md) for the 50-test total.)
+**Overall Assessment:** The codebase is well-structured with strong accounting invariants enforced inline. No critical or high-severity issues were found. Two medium findings were identified: one (missing reservation expiry enforcement) was fixed with a new `expireReservation()` function; the other (phantom value from settlement fee income) is an intentional architectural decision documented as acknowledged. All 39 tests pass at 10,000 fuzz iterations including 2.88M invariant assertions. (Post-audit testing expanded significantly: deep re-audit added 11 tests, advanced edge-case audit added 15, security audit attacks added 10, and full lifecycle E2E added 8, bringing the current total to **83 tests** across 11 files. See [DEEP-AUDIT-REPORT.md](./DEEP-AUDIT-REPORT.md) and [CRE-AI-ARCHITECTURE.md](./CRE-AI-ARCHITECTURE.md) for details.)
 
 ---
 
@@ -363,9 +363,13 @@ Cross-referenced against known DeFi exploits and common vulnerability patterns:
 | `LaneVault4626.EnhancedInvariants.t.sol` | 1 | Invariant (48 actions, 6 invariants) | 10,000 |
 | `LaneSettlementAdapter.t.sol` | 6 | Unit + integration | — |
 | `LaneVaultScaffold.t.sol` | 5 | Unit | — |
-| **Total (Phase 1)** | **39** | | |
+| `SecurityAudit.Attacks.t.sol` | 10 | Attack scenario (ATK-B01 to B10) | — |
+| `DeepAudit.t.sol` | 11 | Deep audit verification | — |
+| `AdvancedAudit.t.sol` | 15 | Advanced edge cases (ADV-01 to ADV-15) | — |
+| `E2E.t.sol` | 8 | Full lifecycle E2E (E2E-01 to E2E-08) | — |
+| **Total** | **83** | | |
 
-> **Note:** The deep re-audit ([DEEP-AUDIT-REPORT.md](./DEEP-AUDIT-REPORT.md)) added 11 additional tests (DeepAudit.t.sol), bringing the current total to **50 tests** across 8 files.
+> **Note:** Phase 1 audit established 39 tests. Subsequent audits expanded coverage: deep re-audit (+11), security audit attacks (+10), advanced edge-case audit (+15), and full lifecycle E2E tests (+8) bring the current total to **83 tests** across 11 files.
 
 ### 11.2 Fuzz Statistics (10K Runs)
 
@@ -384,8 +388,9 @@ Cross-referenced against known DeFi exploits and common vulnerability patterns:
 ### 11.3 Final Test Run
 
 ```
-39 tests passed, 0 failed, 0 skipped (Phase 1; current total with deep audit: 50)
-Total wall time: 93.64s (132.39s CPU)
+83 tests passed, 0 failed, 0 skipped
+11 test suites across 11 files
+Total invariant assertions: ~4.16M (10K fuzz runs)
 ```
 
 ---

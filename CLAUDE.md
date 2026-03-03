@@ -12,7 +12,7 @@
 2. **OpenZeppelin version is `5.0.2`** -- do not upgrade without explicit approval
 3. **No proxy patterns** -- contracts are immutable by design
 4. **All state-mutating functions must have `nonReentrant`** -- no exceptions
-5. **Run `forge test -vv` before any commit** -- all 60 tests must pass
+5. **Run `forge test -vv` before any commit** -- all 83 tests must pass
 6. **Run `forge fmt --check` before any commit** -- formatting must be clean
 7. **Never modify `_assertAccountingInvariants()` without adding corresponding test coverage**
 8. **Conventional commits:** `feat:`, `fix:`, `docs:`, `chore:`, `test:`
@@ -36,16 +36,42 @@ test/
   LaneSettlementAdapter.t.sol            -- Adapter tests (6)
   LaneVaultScaffold.t.sol                -- Scaffold tests (5)
   DeepAudit.t.sol                        -- Deep audit tests (11)
+  AdvancedAudit.t.sol                    -- Advanced edge-case audit (15): ADV-01 to ADV-15
+  E2E.t.sol                              -- Full lifecycle E2E tests (8): E2E-01 to E2E-08
   mocks/MockERC20.sol                    -- Test mock
 
 script/
   Deploy.s.sol               -- Deployment script (deploys paused)
 
+workflows/                   -- CRE autonomous monitoring (3 workflows)
+  vault-health/              -- 5-bucket monitoring + risk classification
+  bridge-ai-advisor/         -- AI policy optimizer (HTTPClient + consensus)
+  queue-monitor/             -- FIFO queue + liquidity coverage tracking
+
+scripts/                     -- Orchestration & proof writing
+  bridge-unified-cycle.sh    -- Phase 1 + 1.5 + 2 orchestration
+  record-bridge-proofs.mjs   -- On-chain proof writes to Sepolia
+  composite-bridge-intelligence.mjs -- Cross-workflow correlation
+
+platform/
+  bridge_analyze_endpoint.py -- Flask AI analysis server (Claude Haiku)
+
 docs/
   WHITEPAPER.md              -- Technical whitepaper
   AUDIT-REPORT.md            -- Phase 1 audit (9-phase methodology)
   DEEP-AUDIT-REPORT.md       -- Deep re-audit (cross-system)
+  CRE-AI-ARCHITECTURE.md     -- CRE & AI architecture (hackathon focus)
+  submission.md              -- Hackathon submission
 ```
+
+## CRE Workflow Rules
+
+9. **Workflow isolation:** each workflow is a standalone CRE project with own `package.json`, `node_modules`, config, and ABIs. No shared state between workflows at runtime.
+10. **CRE SDK patterns:** Use `consensusIdenticalAggregation` for all HTTPClient calls. Use `encodeCallMsg` for all EVMClient calls. Use `getNetwork` for chain resolution. Use `CronCapability` for scheduling.
+11. **Proof hashes are immutable.** Once a `snapshotHash` is written on-chain, it cannot be altered. The hash encoding must stay consistent across TypeScript and Solidity.
+12. **AI analysis costs money.** The Flask endpoint uses Claude Haiku (~$0.001-0.003/call). Every workflow simulation that hits this endpoint costs API credits.
+13. **Use Bun for workflows, not npm.** Install deps: `cd workflows/<name>/my-workflow && bun install`
+14. **CHAINLINK.md must be updated** if any Chainlink touchpoint changes.
 
 ## Key Concepts
 

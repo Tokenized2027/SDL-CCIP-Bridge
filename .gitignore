@@ -23,3 +23,15 @@ broadcast/
 # Coverage
 lcov.info
 coverage/
+
+# CRE Workflows
+workflows/*/my-workflow/node_modules/
+workflows/*/my-workflow/dist/
+workflows/*/my-workflow/config.staging.json
+intelligence/data/
+scripts/.last-bridge-write-state.json
+
+# Python
+__pycache__/
+*.pyc
+platform/venv/

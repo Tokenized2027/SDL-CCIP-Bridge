@@ -30,7 +30,7 @@ This deep re-audit covered **2,121 nSLOC** across three Solidity systems that ha
 5. `forceApprove(0)` after strategy deploy (residual approval cleanup)
 6. Emergency release timer added for stuck CCIP in-flight fills (72h default)
 
-**27 new tests written** across the three systems (10 + 11 + 6), including 4 fuzz properties with 256+ runs each. All tests pass: **178 (arb vault) + 50 (CCIP bridge) + 30 (sentinel) = 258 total tests.**
+**27 new tests written** across the three systems (10 + 11 + 6), including 4 fuzz properties with 256+ runs each. All tests pass. (Note: CCIP bridge test count has since grown to **83 tests** with additional security audit attacks, advanced edge-case tests, and full lifecycle E2E tests added post deep-audit.)
 
 ---
 
@@ -39,7 +39,7 @@ This deep re-audit covered **2,121 nSLOC** across three Solidity systems that ha
 | System | Path | nSLOC | Solc | OZ Version | Existing Tests | New Tests |
 |--------|------|-------|------|------------|---------------|-----------|
 | stLINK Arb Vault | `clients/stake-link/arb-vault/contracts/` | 1,303 | 0.8.24 | 5.1.0 | 168 (1.73M invariant assertions) | 10 |
-| CCIP Bridge (LaneVault4626) | `src/` | ~800 | 0.8.24 | 5.0.2 | 39 → 50 total (4.16M invariant assertions) | 11 |
+| CCIP Bridge (LaneVault4626) | `src/` | ~800 | 0.8.24 | 5.0.2 | 39 → 83 total (4.16M invariant assertions) | 11 (+33 post deep-audit) |
 | Sentinel Registry | `~/orbital-sentinel/contracts/` | ~90 | 0.8.19 | N/A | 24 → 31 total (70K fuzz iterations) | 7 |
 
 ---
@@ -366,4 +366,4 @@ The most complex function is `_distributeProfit` in StLINKArbVault with ~14 loca
 
 ---
 
-*Report generated from 28 manual checks, 4 cross-system analyses, 27 new Foundry tests (including 4 fuzz properties), dependency CVE review, gas analysis, and EVM edge case assessment. All 7 actionable findings fixed in code. All 259 tests passing across 3 systems as of March 1, 2026.*
+*Report generated from 28 manual checks, 4 cross-system analyses, 27 new Foundry tests (including 4 fuzz properties), dependency CVE review, gas analysis, and EVM edge case assessment. All 7 actionable findings fixed in code. CCIP bridge now at 83 tests (as of March 3, 2026) following additional security audit attacks, advanced edge-case tests, and full lifecycle E2E test suite.*
