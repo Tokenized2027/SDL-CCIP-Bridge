@@ -60,7 +60,7 @@ platform/
   bridge_analyze_endpoint.py -- Flask AI analysis server (GPT-5.2)
 
 docs/
-  WHITEPAPER.md              -- Technical whitepaper
+  WHITEPAPER.md              -- Technical whitepaper v2.0 (full system: vault + CCIP + CRE/DON + AI + proofs)
   AUDIT-REPORT.md            -- Phase 1 audit (9-phase methodology)
   DEEP-AUDIT-REPORT.md       -- Deep re-audit (cross-system)
   CRE-AI-ARCHITECTURE.md     -- CRE & AI architecture (hackathon focus)
