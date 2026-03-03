@@ -79,7 +79,7 @@ OK:       all metrics within bounds
 
 ### 2. Bridge AI Advisor
 
-**Purpose:** AI-powered policy optimization using GPT-4o via DON consensus.
+**Purpose:** AI-powered policy optimization using GPT-5.2 via DON consensus.
 
 **Schedule:** Every 30 minutes via `CronCapability`
 
@@ -93,7 +93,7 @@ CRE Workflow (DON nodes)
     │   │
     │   └─ POST /api/cre/analyze-bridge
     │       ├─ Input: vault state metrics
-    │       ├─ AI Model: GPT-4o (gpt-4o)
+    │       ├─ AI Model: GPT-5.2 (gpt-5.2)
     │       └─ Output: structured JSON recommendation
     │
     └─ EVMClient: write proof hash to SentinelRegistry
@@ -103,7 +103,7 @@ CRE Workflow (DON nodes)
 
 **AI Analysis Endpoint (`platform/bridge_analyze_endpoint.py`):**
 - Flask server with `X-CRE-Secret` authentication
-- Calls GPT-4o with structured prompt containing all vault metrics
+- Calls GPT-5.2 with structured prompt containing all vault metrics
 - Returns deterministic JSON: `{ risk, recommendation, suggestedActions, policyAdjustments, confidence, reasoning }`
 - Policy adjustments: `maxUtilizationBps`, `badDebtReserveCutBps`, `targetHotReserveBps`
 - Heuristic fallback when API key is unavailable
@@ -365,7 +365,7 @@ workflows/
     config.example.json        # Queue thresholds + registry
 
 platform/
-  bridge_analyze_endpoint.py   # Flask AI server (GPT-4o)
+  bridge_analyze_endpoint.py   # Flask AI server (GPT-5.2)
 
 scripts/
   bridge-unified-cycle.sh      # Phase 1 + 1.5 + 2 orchestration

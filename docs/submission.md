@@ -29,7 +29,7 @@ SDL CCIP Bridge is an AI-powered ERC-4626 LP vault for cross-chain bridge liquid
 
 1. **Vault Health Monitor** reads all 5 liquidity buckets, policy parameters, pause state, queue depth, and LINK/USD price via EVMClient. Classifies vault risk (`ok|warning|critical`) and writes keccak256 proof hash to SentinelRegistry on Sepolia.
 
-2. **Bridge AI Advisor** reads vault state via EVMClient, then calls an AI analysis endpoint (GPT-4o) via HTTPClient with `consensusIdenticalAggregation`. All DON nodes must agree on the AI response before it's accepted. The AI recommends policy parameter adjustments (utilization cap, reserve cut, hot reserve target).
+2. **Bridge AI Advisor** reads vault state via EVMClient, then calls an AI analysis endpoint (GPT-5.2) via HTTPClient with `consensusIdenticalAggregation`. All DON nodes must agree on the AI response before it's accepted. The AI recommends policy parameter adjustments (utilization cap, reserve cut, hot reserve target).
 
 3. **Queue Monitor** tracks the FIFO redemption queue depth, liquidity coverage ratio, and individual request wait times. Detects queue buildup and liquidity crunch scenarios before LPs get locked.
 
@@ -48,7 +48,7 @@ Every workflow run produces an immutable on-chain proof: a `HealthRecorded` even
 - **HTTPClient + consensusIdenticalAggregation**: AI analysis with DON consensus
 - **CronCapability**: autonomous 15-30 minute scheduling
 - **getNetwork()**: chain selector resolution (mainnet reads + Sepolia writes)
-- **GPT-4o**: structured risk assessment via Flask endpoint
+- **GPT-5.2**: structured risk assessment via Flask endpoint
 - **viem**: on-chain interaction library for proof hash computation
 
 ---

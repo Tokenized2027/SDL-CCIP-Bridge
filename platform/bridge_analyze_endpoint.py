@@ -6,7 +6,7 @@ Two endpoints:
   POST /api/cre/analyze-bridge       - Single vault state analysis (bridge-ai-advisor workflow)
   POST /api/cre/analyze-bridge-composite - Cross-workflow composite analysis
 
-Uses OpenAI GPT-4o for structured analysis (~$0.003-0.005/call).
+Uses OpenAI GPT-5.2 for structured analysis (~$0.004/call).
 
 Setup:
     pip install flask openai
@@ -50,7 +50,7 @@ def verify_cre_secret(req):
 def analyze_vault_state(vault_state: dict) -> dict:
     """
     Analyze vault state and produce policy recommendations.
-    Uses GPT-4o for structured risk assessment.
+    Uses GPT-5.2 for structured risk assessment.
     """
     if not OPENAI_API_KEY:
         return heuristic_analysis(vault_state)
@@ -90,8 +90,8 @@ Respond with ONLY valid JSON (no markdown, no explanation outside JSON):
 }}"""
 
         response = client.chat.completions.create(
-            model="gpt-4o",
-            max_tokens=500,
+            model="gpt-5.2",
+            max_completion_tokens=500,
             messages=[{"role": "user", "content": prompt}],
         )
 
@@ -188,8 +188,8 @@ Respond with ONLY valid JSON:
 }}"""
 
         response = client.chat.completions.create(
-            model="gpt-4o",
-            max_tokens=300,
+            model="gpt-5.2",
+            max_completion_tokens=300,
             messages=[{"role": "user", "content": prompt}],
         )
 

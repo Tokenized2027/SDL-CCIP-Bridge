@@ -57,7 +57,7 @@ scripts/                     -- Orchestration & proof writing
   simulate-bridge-lifecycle.sh -- Full bridge lifecycle simulation
 
 platform/
-  bridge_analyze_endpoint.py -- Flask AI analysis server (GPT-4o)
+  bridge_analyze_endpoint.py -- Flask AI analysis server (GPT-5.2)
 
 docs/
   WHITEPAPER.md              -- Technical whitepaper
@@ -100,7 +100,7 @@ Owner: `0xB250152756E2d6E3bD237a6875aE5E26e3D3877b`. CRE user: `avi@stake.link` 
 9. **Workflow isolation:** each workflow is a standalone CRE project with own `package.json`, `node_modules`, config, and ABIs. No shared state between workflows at runtime.
 10. **CRE SDK patterns:** Use `consensusIdenticalAggregation` for all HTTPClient calls. Use `encodeCallMsg` for all EVMClient calls. Use `getNetwork` for chain resolution. Use `CronCapability` for scheduling.
 11. **Proof hashes are immutable.** Once a `snapshotHash` is written on-chain, it cannot be altered. The hash encoding must stay consistent across TypeScript and Solidity.
-12. **AI analysis costs money.** The Flask endpoint uses GPT-4o (~$0.003-0.005/call). Every workflow simulation that hits this endpoint costs API credits.
+12. **AI analysis costs money.** The Flask endpoint uses GPT-5.2 (~$0.003-0.005/call). Every workflow simulation that hits this endpoint costs API credits.
 13. **Use Bun for workflows, not npm.** Install deps: `cd workflows/<name>/my-workflow && bun install`
 15. **CRE 15-read limit per workflow.** Each workflow execution gets max 15 EVMClient calls. Vault-health and bridge-ai-advisor are trimmed to 11 reads each (4 buckets + 2 totals + 2 policy + 1 pause + 1 queue + 1 price). Do NOT add reads without removing others.
 16. **Testnet chain resolution.** `getNetwork()` requires `isTestnet: true` for testnet chains. All workflows auto-detect via `chainName.includes('testnet')`.

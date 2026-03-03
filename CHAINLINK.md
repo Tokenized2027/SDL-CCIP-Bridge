@@ -134,7 +134,7 @@ const result = http
   .result();
 ```
 
-The AI endpoint (`platform/bridge_analyze_endpoint.py`) uses GPT-4o to analyze vault state and recommend policy adjustments. All DON nodes must receive identical AI response before accepting it.
+The AI endpoint (`platform/bridge_analyze_endpoint.py`) uses GPT-5.2 to analyze vault state and recommend policy adjustments. All DON nodes must receive identical AI response before accepting it.
 
 Analysis produces:
 - Risk classification (`ok|warning|critical`)
