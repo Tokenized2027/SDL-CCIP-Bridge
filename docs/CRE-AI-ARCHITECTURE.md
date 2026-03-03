@@ -79,7 +79,7 @@ OK:       all metrics within bounds
 
 ### 2. Bridge AI Advisor
 
-**Purpose:** AI-powered policy optimization using Claude Haiku via DON consensus.
+**Purpose:** AI-powered policy optimization using GPT-5.3-Codex via DON consensus.
 
 **Schedule:** Every 30 minutes via `CronCapability`
 
@@ -93,7 +93,7 @@ CRE Workflow (DON nodes)
     │   │
     │   └─ POST /api/cre/analyze-bridge
     │       ├─ Input: vault state metrics
-    │       ├─ AI Model: Claude Haiku (claude-haiku-4-5-20251001)
+    │       ├─ AI Model: GPT-5.3-Codex (gpt-5.3-codex)
     │       └─ Output: structured JSON recommendation
     │
     └─ EVMClient: write proof hash to SentinelRegistry
@@ -103,11 +103,11 @@ CRE Workflow (DON nodes)
 
 **AI Analysis Endpoint (`platform/bridge_analyze_endpoint.py`):**
 - Flask server with `X-CRE-Secret` authentication
-- Calls Claude Haiku with structured prompt containing all vault metrics
+- Calls GPT-5.3-Codex with structured prompt containing all vault metrics
 - Returns deterministic JSON: `{ risk, recommendation, suggestedActions, policyAdjustments, confidence, reasoning }`
 - Policy adjustments: `maxUtilizationBps`, `badDebtReserveCutBps`, `targetHotReserveBps`
 - Heuristic fallback when API key is unavailable
-- Cost: ~$0.001-0.003 per analysis call
+- Cost: ~$0.003-0.005 per analysis call
 
 **Example AI Response:**
 ```json
@@ -365,7 +365,7 @@ workflows/
     config.example.json        # Queue thresholds + registry
 
 platform/
-  bridge_analyze_endpoint.py   # Flask AI server (Claude Haiku)
+  bridge_analyze_endpoint.py   # Flask AI server (GPT-5.3-Codex)
 
 scripts/
   bridge-unified-cycle.sh      # Phase 1 + 1.5 + 2 orchestration

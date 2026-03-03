@@ -119,7 +119,7 @@ CRE stands for **Chainlink Runtime Environment**. It's Chainlink's framework for
 
 ### Workflow 2: Bridge AI Advisor (every 30 minutes)
 
-This is the novel part. The workflow reads the same vault state, then sends it to a Claude Haiku AI model via CRE's `HTTPClient`.
+This is the novel part. The workflow reads the same vault state, then sends it to a GPT-5.3-Codex AI model via CRE's `HTTPClient`.
 
 **The AI receives:**
 - Current utilization, queue depth, reserve ratio, share price
@@ -143,7 +143,7 @@ This is the novel part. The workflow reads the same vault state, then sends it t
 
 **Why consensus matters:** The AI call uses `consensusIdenticalAggregation`. This means every DON node independently calls the AI endpoint and all must receive the same structured response. No single node can inject a false recommendation. The AI endpoint is engineered for deterministic JSON output to enable this consensus.
 
-**Cost:** ~$0.001-0.003 per analysis call (Claude Haiku). Free contract reads.
+**Cost:** ~$0.003-0.005 per analysis call (GPT-5.3-Codex). Free contract reads.
 
 ### Workflow 3: Queue Monitor (every 15 minutes)
 
@@ -247,7 +247,7 @@ If `_ccipReceive` reverts, all state changes roll back atomically. The CCIP Rout
 | **Vault** | ERC-4626 with 5-bucket accounting | Solidity 0.8.24, OpenZeppelin 5.0.2 |
 | **Settlement** | Chainlink CCIP canonical messages | LaneSettlementAdapter with 3-layer security |
 | **Monitoring** | 3 CRE workflows (health, AI advisor, queue) | CRE SDK, EVMClient, HTTPClient, CronCapability |
-| **AI** | Policy optimization recommendations | Claude Haiku via consensusIdenticalAggregation |
+| **AI** | Policy optimization recommendations | GPT-5.3-Codex via consensusIdenticalAggregation |
 | **Proofs** | keccak256 hashes on Sepolia | SentinelRegistry.recordHealth() |
 | **Composite** | Cross-workflow risk correlation | Cascade detection across all 3 workflows |
 | **Security** | 83 tests, 4.16M fuzz assertions, triple audit | Foundry, 10K fuzz iterations |

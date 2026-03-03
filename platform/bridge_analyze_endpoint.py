@@ -6,7 +6,13 @@ Two endpoints:
   POST /api/cre/analyze-bridge       - Single vault state analysis (bridge-ai-advisor workflow)
   POST /api/cre/analyze-bridge-composite - Cross-workflow composite analysis
 
-Uses Claude Haiku for cost-efficient structured analysis (~$0.001-0.003/call).
+Uses OpenAI GPT-5.3-Codex for structured analysis (~$0.003-0.005/call).
+
+Setup:
+    pip install flask openai
+    export OPENAI_API_KEY=your_key
+    export CRE_SECRET=your_secret
+    python bridge_analyze_endpoint.py
 """
 
 import json
@@ -16,7 +22,7 @@ from flask import Flask, request, jsonify
 
 app = Flask(__name__)
 
-ANTHROPIC_API_KEY = os.environ.get("ANTHROPIC_API_KEY", "")
+OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY", "")
 CRE_SECRET = os.environ.get("CRE_SECRET", "")
 
 if not CRE_SECRET:
@@ -33,14 +39,14 @@ def verify_cre_secret(req):
 def analyze_vault_state(vault_state: dict) -> dict:
     """
     Analyze vault state and produce policy recommendations.
-    Uses Claude Haiku for structured risk assessment.
+    Uses GPT-5.3-Codex for structured risk assessment.
     """
-    if not ANTHROPIC_API_KEY:
+    if not OPENAI_API_KEY:
         return heuristic_analysis(vault_state)
 
     try:
-        import anthropic
-        client = anthropic.Anthropic(api_key=ANTHROPIC_API_KEY)
+        from openai import OpenAI
+        client = OpenAI(api_key=OPENAI_API_KEY)
 
         prompt = f"""Analyze this ERC-4626 bridge vault state and provide policy recommendations.
 
@@ -70,13 +76,13 @@ Respond with ONLY valid JSON (no markdown, no explanation outside JSON):
   "reasoning": "brief reasoning"
 }}"""
 
-        response = client.messages.create(
-            model="claude-haiku-4-5-20251001",
+        response = client.chat.completions.create(
+            model="gpt-5.3-codex",
             max_tokens=500,
             messages=[{"role": "user", "content": prompt}],
         )
 
-        text = response.content[0].text.strip()
+        text = response.choices[0].message.content.strip()
         # Strip markdown fences if present
         if text.startswith("```"):
             text = text.split("\n", 1)[1]
@@ -132,7 +138,7 @@ def heuristic_analysis(vault_state: dict) -> dict:
 
 def analyze_composite(data: dict) -> dict:
     """Composite cross-workflow analysis."""
-    if not ANTHROPIC_API_KEY:
+    if not OPENAI_API_KEY:
         return {
             "risk": data.get("compositeRisk", "ok"),
             "confidence": 0.5,
@@ -141,8 +147,8 @@ def analyze_composite(data: dict) -> dict:
         }
 
     try:
-        import anthropic
-        client = anthropic.Anthropic(api_key=ANTHROPIC_API_KEY)
+        from openai import OpenAI
+        client = OpenAI(api_key=OPENAI_API_KEY)
 
         prompt = f"""Analyze this cross-workflow bridge intelligence and identify ecosystem-level risks.
 
@@ -166,13 +172,13 @@ Respond with ONLY valid JSON:
   "escalations": ["escalation1_if_any"]
 }}"""
 
-        response = client.messages.create(
-            model="claude-haiku-4-5-20251001",
+        response = client.chat.completions.create(
+            model="gpt-5.3-codex",
             max_tokens=300,
             messages=[{"role": "user", "content": prompt}],
         )
 
-        text = response.content[0].text.strip()
+        text = response.choices[0].message.content.strip()
         if text.startswith("```"):
             text = text.split("\n", 1)[1]
             if text.endswith("```"):

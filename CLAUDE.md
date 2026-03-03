@@ -54,7 +54,7 @@ scripts/                     -- Orchestration & proof writing
   composite-bridge-intelligence.mjs -- Cross-workflow correlation
 
 platform/
-  bridge_analyze_endpoint.py -- Flask AI analysis server (Claude Haiku)
+  bridge_analyze_endpoint.py -- Flask AI analysis server (GPT-5.3-Codex)
 
 docs/
   WHITEPAPER.md              -- Technical whitepaper
@@ -72,7 +72,7 @@ docs/
 9. **Workflow isolation:** each workflow is a standalone CRE project with own `package.json`, `node_modules`, config, and ABIs. No shared state between workflows at runtime.
 10. **CRE SDK patterns:** Use `consensusIdenticalAggregation` for all HTTPClient calls. Use `encodeCallMsg` for all EVMClient calls. Use `getNetwork` for chain resolution. Use `CronCapability` for scheduling.
 11. **Proof hashes are immutable.** Once a `snapshotHash` is written on-chain, it cannot be altered. The hash encoding must stay consistent across TypeScript and Solidity.
-12. **AI analysis costs money.** The Flask endpoint uses Claude Haiku (~$0.001-0.003/call). Every workflow simulation that hits this endpoint costs API credits.
+12. **AI analysis costs money.** The Flask endpoint uses GPT-5.3-Codex (~$0.003-0.005/call). Every workflow simulation that hits this endpoint costs API credits.
 13. **Use Bun for workflows, not npm.** Install deps: `cd workflows/<name>/my-workflow && bun install`
 14. **CHAINLINK.md must be updated** if any Chainlink touchpoint changes.
 

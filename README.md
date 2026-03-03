@@ -232,7 +232,7 @@ Three Chainlink CRE workflows provide autonomous, AI-powered monitoring of vault
 | Workflow | CRE Capabilities | Purpose |
 |----------|-------------------|---------|
 | **vault-health** | EVMClient, CronCapability, Data Feed | Reads all 5 liquidity buckets, policy params, pause state, queue depth, LINK/USD price. Classifies risk and writes proof hash to SentinelRegistry on Sepolia. |
-| **bridge-ai-advisor** | EVMClient, HTTPClient + Consensus, CronCapability | Reads vault state, calls AI analysis endpoint (Claude Haiku) with `consensusIdenticalAggregation` for policy optimization. Recommends parameter adjustments. |
+| **bridge-ai-advisor** | EVMClient, HTTPClient + Consensus, CronCapability | Reads vault state, calls AI analysis endpoint (GPT-5.3-Codex) with `consensusIdenticalAggregation` for policy optimization. Recommends parameter adjustments. |
 | **queue-monitor** | EVMClient, CronCapability | Monitors FIFO redemption queue depth, liquidity coverage ratio, and wait times. Detects queue buildup before LPs get locked. |
 
 ### Architecture
@@ -276,7 +276,7 @@ cd workflows/vault-health && ./run_snapshot.sh staging-settings
 ./scripts/bridge-unified-cycle.sh
 
 # Start AI analysis endpoint
-ANTHROPIC_API_KEY=... python platform/bridge_analyze_endpoint.py
+OPENAI_API_KEY=... python platform/bridge_analyze_endpoint.py
 ```
 
 ### File Structure
@@ -293,7 +293,7 @@ scripts/
 └── composite-bridge-intelligence.mjs # Cross-workflow correlation
 
 platform/
-└── bridge_analyze_endpoint.py       # Flask AI analysis server (Claude Haiku)
+└── bridge_analyze_endpoint.py       # Flask AI analysis server (GPT-5.3-Codex)
 
 intelligence/data/                   # Snapshot JSON output (gitignored)
 ```
