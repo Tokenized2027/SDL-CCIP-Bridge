@@ -8,7 +8,7 @@
 
 ## Abstract
 
-The SDL CCIP Bridge is a non-upgradeable, audited smart contract system that provides liquidity infrastructure for cross-chain asset bridging. The system combines an ERC-4626 LP vault with Chainlink CCIP for canonical settlement, Chainlink CRE (Compute Runtime Environment) for autonomous monitoring, and AI-powered policy optimization via GPT-5.2 with DON consensus validation. Three CRE workflows run autonomously on the Chainlink Decentralized Oracle Network (DON), reading vault state every 15-30 minutes, classifying risk, and anchoring keccak256 proof hashes on-chain. A composite intelligence layer cross-correlates workflow outputs to detect ecosystem-level risks invisible to any single monitor.
+The SDL CCIP Bridge is a non-upgradeable, audited smart contract system that provides liquidity infrastructure for cross-chain asset bridging. The system combines an ERC-4626 LP vault with Chainlink CCIP for canonical settlement, Chainlink CRE (Runtime Environment) for autonomous monitoring, and AI-powered policy optimization via GPT-5.2 with DON consensus validation. Three CRE workflows run autonomously on the Chainlink Decentralized Oracle Network (DON), reading vault state every 15-30 minutes, classifying risk, and anchoring keccak256 proof hashes on-chain. A composite intelligence layer cross-correlates workflow outputs to detect ecosystem-level risks invisible to any single monitor.
 
 This paper details the complete system: smart contracts, settlement mechanics, liquidity accounting, autonomous monitoring, AI integration, on-chain proof verification, and security properties.
 
@@ -481,7 +481,7 @@ The deployment script deploys the vault **fully paused**. Operations must be exp
 
 ### 10.1 What is CRE?
 
-Chainlink's Compute Runtime Environment (CRE) allows developers to define workflows in TypeScript that execute autonomously on the Decentralized Oracle Network (DON). CRE workflows have access to built-in capabilities:
+Chainlink's Runtime Environment (CRE) allows developers to define workflows in TypeScript that execute autonomously on the Decentralized Oracle Network (DON). CRE workflows have access to built-in capabilities:
 
 | Capability | Purpose |
 |------------|---------|
