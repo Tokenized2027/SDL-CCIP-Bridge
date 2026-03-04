@@ -1,0 +1,41 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  contracts:
+    name: Contracts (fmt + build + test)
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Install Foundry (pinned)
+        uses: foundry-rs/foundry-toolchain@v1
+        with:
+          version: "1.5.1"
+
+      - name: Verify Foundry pin
+        run: |
+          forge --version
+          forge --version | grep -E "forge Version: 1\\.5\\.1(-stable|-v1\\.5\\.1)"
+          forge --version | grep -F "Commit SHA: b0a9dd9ceda36f63e2326ce530c10e6916f4b8a2"
+
+      - name: Forge fmt check
+        run: forge fmt --check
+
+      - name: Forge build
+        run: forge build
+
+      - name: Forge tests
+        run: forge test -vv
+
+      - name: Forge gas report (non-blocking)
+        run: forge test --gas-report || true
