@@ -9,6 +9,7 @@
 | Team Size | 1 |
 | Prize Tracks | CRE & AI, DeFi & Tokenization |
 | GitHub | https://github.com/Tokenized2027/SDL-CCIP-Bridge |
+| Demo Video | https://www.youtube.com/watch?v=6fGbyOTxOS8 |
 | Chainlink Usage | https://github.com/Tokenized2027/SDL-CCIP-Bridge/blob/main/CHAINLINK.md |
 | Contract (Sepolia) | https://sepolia.etherscan.io/address/0xE5B1b708b237F9F0F138DE7B03EEc1Eb1a871d40 |
 | CRE Registry (Mainnet) | https://etherscan.io/address/0x4Ac54353FA4Fa961AfcC5ec4B118596d3305E7e5 |
