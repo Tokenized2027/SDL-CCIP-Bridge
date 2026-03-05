@@ -4,6 +4,8 @@ ERC-4626 LP vault with queue-based redemptions and Chainlink CCIP settlement for
 
 **[Demo Video](https://www.youtube.com/watch?v=6fGbyOTxOS8)**
 
+Ownership/execution model: [`docs/workflows/paperclip-operating-model.md`](docs/workflows/paperclip-operating-model.md)
+
 ## Overview
 
 The SDL CCIP Bridge is a non-upgradeable smart contract system that manages liquidity for cross-chain asset bridging using Chainlink's Cross-Chain Interoperability Protocol (CCIP). Liquidity providers deposit assets into an ERC-4626 vault and earn fees from bridge settlement activity. Bonded solvers provide instant destination-chain fulfillment, and CCIP canonical messages settle the accounting.
