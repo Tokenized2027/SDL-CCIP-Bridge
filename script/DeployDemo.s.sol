@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.24;
+pragma solidity 0.8.24;
 
 import { Script, console } from "forge-std/Script.sol";
 import { IERC20 } from "openzeppelin-contracts/contracts/token/ERC20/IERC20.sol";
@@ -37,16 +37,13 @@ contract DeployLaneVaultDemo is Script {
       IERC20(address(token)),
       "Lane Vault LP (Demo)",
       "lvLP-demo",
-      0,           // no admin delay for demo
+      0, // no admin delay for demo
       initialAdmin
     );
     console.log("Vault deployed:", address(vault));
 
     // 4. Deploy adapter
-    LaneSettlementAdapter adapter = new LaneSettlementAdapter(
-      ccipRouter,
-      ILaneVaultSettlement(address(vault))
-    );
+    LaneSettlementAdapter adapter = new LaneSettlementAdapter(ccipRouter, ILaneVaultSettlement(address(vault)));
     console.log("Adapter deployed:", address(adapter));
 
     // 5. Wire adapter

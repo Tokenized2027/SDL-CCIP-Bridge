@@ -125,6 +125,7 @@ contract LaneVault4626 is ERC4626, AccessControlDefaultAdminRules, ReentrancyGua
   event SettlementLoss(bytes32 indexed fillId, bytes32 indexed routeId, uint256 principal, uint256 recovered);
 
   error EmergencyReleaseNotReady(bytes32 fillId, uint256 readyAt);
+  error EmergencyReleaseDelayTooShort();
 
   uint48 public emergencyReleaseDelay = 3 days;
 
@@ -201,6 +202,9 @@ contract LaneVault4626 is ERC4626, AccessControlDefaultAdminRules, ReentrancyGua
     return freeLiquidityAssets - reserved;
   }
 
+  /// @notice Preview the split between instant and queued assets for a share redemption.
+  /// @param shares The number of vault shares to redeem.
+  /// @return outcome The breakdown of instant vs queued asset amounts.
   function previewRedeemOutcome(uint256 shares) external view returns (PreviewOutcome memory outcome) {
     uint256 assets = previewRedeem(shares);
     uint256 available = availableFreeLiquidityForLP();
@@ -208,6 +212,9 @@ contract LaneVault4626 is ERC4626, AccessControlDefaultAdminRules, ReentrancyGua
     outcome.queuedAssets = assets > outcome.instantAssets ? assets - outcome.instantAssets : 0;
   }
 
+  /// @notice Preview the split between instant and queued assets for an asset withdrawal.
+  /// @param assets The amount of underlying assets to withdraw.
+  /// @return outcome The breakdown of instant vs queued asset amounts.
   function previewWithdrawOutcome(uint256 assets) external view returns (PreviewOutcome memory outcome) {
     uint256 available = availableFreeLiquidityForLP();
     outcome.instantAssets = assets < available ? assets : available;
@@ -583,7 +590,7 @@ contract LaneVault4626 is ERC4626, AccessControlDefaultAdminRules, ReentrancyGua
   }
 
   function setEmergencyReleaseDelay(uint48 newDelay) external onlyRole(GOVERNANCE_ROLE) {
-    require(newDelay >= 1 days, "Minimum 1 day delay");
+    if (newDelay < 1 days) revert EmergencyReleaseDelayTooShort();
     emergencyReleaseDelay = newDelay;
     emit EmergencyReleaseDelayUpdated(newDelay);
   }
