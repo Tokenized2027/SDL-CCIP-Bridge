@@ -46,14 +46,19 @@ contract AdvancedAuditTest is Test {
   }
 
   // ═══════════════════════════════════════════════════════════════════
-  // ADV-01: Policy extremes — 100% bad debt cut + max protocol fee
+  // ADV-01: Policy extremes — combined BPS constraint (Nemesis M-01 fix)
   // ═══════════════════════════════════════════════════════════════════
-  /// @notice When badDebtReserveCutBps = 10000 (100%) and protocolFeeBps = cap (100%),
-  ///         ALL fee income is absorbed. LP distributable must be zero. Accounting must hold.
+  /// @notice Setting badDebtReserveCutBps + protocolFeeBps > 10000 must revert.
+  ///         This prevents cumulative sub-allocation overflow that locks LP operations.
   function test_ADV01_PolicyExtremes_AllFeeAbsorbed() public {
-    // Set extreme policy: 100% to bad debt reserve, 100% to protocol fee
+    // Combined BPS > 10000 must revert (Nemesis M-01 fix)
     vm.prank(governance);
+    vm.expectRevert(LaneVault4626.CombinedFeeBpsExceedsDenominator.selector);
     vault.setPolicy(10_000, 9_000, 2_000, 10_000, 10_000);
+
+    // Valid extreme: 100% to bad debt reserve, 0% protocol fee
+    vm.prank(governance);
+    vault.setPolicy(10_000, 9_000, 2_000, 0, 10_000);
 
     vm.prank(alice);
     vault.deposit(1_000_000e18, alice);
@@ -71,15 +76,15 @@ contract AdvancedAuditTest is Test {
     vault.reconcileSettlementSuccess(fillId, principal, fee);
 
     // reserveCut = fee * 10000/10000 = fee (100%)
-    // protocolFee = fee * 10000/10000 = fee (100%)
-    // distributable = max(fee - 2*fee, 0) = 0
-    assertEq(vault.settledFeesEarnedAssets(), 0, "ADV-01: distributable must be zero with extreme policy");
+    // protocolFee = fee * 0/10000 = 0 (0%)
+    // distributable = max(fee - fee, 0) = 0
+    assertEq(vault.settledFeesEarnedAssets(), 0, "ADV-01: distributable must be zero with 100% reserve cut");
 
     // Bad debt reserve got the full fee amount
     assertEq(vault.badDebtReserveAssets(), fee, "ADV-01: bad debt reserve must absorb full fee");
 
-    // Protocol fee also got the full fee amount
-    assertEq(vault.protocolFeeAccruedAssets(), fee, "ADV-01: protocol fee must absorb full fee");
+    // Protocol fee should be zero (0% protocolFeeBps)
+    assertEq(vault.protocolFeeAccruedAssets(), 0, "ADV-01: protocol fee must be zero with 0 bps");
 
     // freeLiq = original(1M) - principal(100k) [reserve] + principal + fee [settlement]
     // = 1M + fee = 1_010_000e18

@@ -1,7 +1,9 @@
 # Security Audit Report: CCIP Bridge (LaneVault4626 Suite)
 
-**Auditor:** Claude (SC Auditor — Enhanced 9-Phase Methodology)
-**Date:** 2026-03-01
+**Auditor:** Claude (SC Auditor — Enhanced 9-Phase Methodology + Nemesis iterative dual-loop)
+**Date:** 2026-03-01 (updated 2026-03-07 with Nemesis audit)
+
+> **2026-03-07 Nemesis Audit Addendum:** Full Nemesis audit (Feynman + State Inconsistency, 7 phases, 4 feedback iterations, 8 adversarial journey traces). 0 CRITICAL, 0 HIGH, 1 MEDIUM fixed (combined BPS overflow in setPolicy), 3 LOW documented, 9 false positives eliminated. Vault architecture assessment: well-designed with strong defense-in-depth. See `.audit/findings/nemesis-verified.md` for full report.
 **Scope:** `src/` (4 files, 766 nSLOC)
 **Solidity:** 0.8.24
 **Framework:** Foundry (forge 1.5.1)

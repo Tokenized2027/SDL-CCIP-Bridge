@@ -28,6 +28,7 @@ contract LaneVault4626 is ERC4626, AccessControlDefaultAdminRules, ReentrancyGua
   error UtilizationCapExceeded();
   error InvariantViolation(string reason);
   error TransferNotAllowlisted(address from, address to);
+  error CombinedFeeBpsExceedsDenominator();
   error ReservationNotExpired(bytes32 routeId, uint64 expiry);
   error BalanceDeficit(uint256 expected, uint256 actual);
 
@@ -95,8 +96,8 @@ contract LaneVault4626 is ERC4626, AccessControlDefaultAdminRules, ReentrancyGua
   uint256 public inFlightLiquidityAssets;
   uint256 public badDebtReserveAssets;
   uint256 public protocolFeeAccruedAssets;
-  uint256 public settledFeesEarnedAssets;
-  uint256 public realizedNavLossAssets;
+  uint256 public settledFeesEarnedAssets; // monitoring-only: cumulative fees earned from settlements
+  uint256 public realizedNavLossAssets; // monitoring-only: cumulative NAV losses from defaults + emergency releases
 
   // Bridge lifecycle state machines
   mapping(bytes32 => RouteReservation) public routes;
@@ -226,12 +227,18 @@ contract LaneVault4626 is ERC4626, AccessControlDefaultAdminRules, ReentrancyGua
     uint256 protocolFeeBps_,
     uint256 protocolFeeCapBps_
   ) external onlyRole(GOVERNANCE_ROLE) {
-    badDebtReserveCutBps = _clampBps(badDebtReserveCutBps_);
+    uint16 clampedReserveCut = _clampBps(badDebtReserveCutBps_);
+    uint16 clampedProtocolFee = _clampBps(protocolFeeBps_);
+    if (uint256(clampedReserveCut) + uint256(clampedProtocolFee) > BPS_DENOMINATOR) {
+      revert CombinedFeeBpsExceedsDenominator();
+    }
+
+    badDebtReserveCutBps = clampedReserveCut;
     maxUtilizationBps = _clampBps(maxUtilizationBps_);
     targetHotReserveBps = _clampBps(targetHotReserveBps_);
     protocolFeeCapBps = _clampBps(protocolFeeCapBps_);
 
-    uint16 requestedProtocolFeeBps = _clampBps(protocolFeeBps_);
+    uint16 requestedProtocolFeeBps = clampedProtocolFee;
     protocolFeeBps = requestedProtocolFeeBps > protocolFeeCapBps ? 0 : requestedProtocolFeeBps;
 
     emit PolicyUpdated(badDebtReserveCutBps, maxUtilizationBps, targetHotReserveBps, protocolFeeBps, protocolFeeCapBps);
