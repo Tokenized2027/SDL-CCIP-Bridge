@@ -1,0 +1,17 @@
+{
+	"schedule": "0 */15 * * * *",
+	"chainName": "ethereum-testnet-sepolia",
+	"vaultAddress": "0x5962FBf9EA3398400869c91f1B39860264d6dB24",
+	"queueManagerAddress": "0xC40Ad4387B75D5BA8BF90b2ce35Ba0062b53aC9B",
+	"assetDecimals": 18,
+	"registry": {
+		"address": "0xE5B1b708b237F9F0F138DE7B03EEc1Eb1a871d40",
+		"chainName": "ethereum-testnet-sepolia"
+	},
+	"thresholds": {
+		"queueWarningCount": 3,
+		"queueCriticalCount": 10,
+		"liquidityCoverageWarning": 0.5,
+		"liquidityCoverageCritical": 0.2
+	}
+}

@@ -1,0 +1,43 @@
+# Compiler output
+out/
+cache/
+
+# Dependencies (installed via forge)
+lib/
+
+# Env files
+.env
+.env.*
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+
+# Foundry broadcast artifacts
+broadcast/
+
+# Coverage
+lcov.info
+coverage/
+
+# Node modules (root + workflows)
+node_modules/
+bun.lock
+
+# CRE Workflows
+workflows/*/my-workflow/node_modules/
+workflows/*/my-workflow/dist/
+workflows/*/my-workflow/config.staging.json
+workflows/*/my-workflow/.cre_build_tmp.js
+workflows/*/my-workflow/binary.wasm.br.b64
+intelligence/data/
+scripts/.last-bridge-write-state.json
+
+# Python
+__pycache__/
+*.pyc
+platform/venv/

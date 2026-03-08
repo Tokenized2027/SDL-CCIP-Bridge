@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SDL CCIP Bridge: Demo Video Script</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --bg: #0a0e1a;
+    --surface: #111827;
+    --surface-2: #1a2235;
+    --border: #1e293b;
+    --accent: #375bd2;
+    --accent-glow: rgba(55, 91, 210, 0.15);
+    --cyan: #22d3ee;
+    --green: #34d399;
+    --amber: #fbbf24;
+    --red: #f87171;
+    --purple: #a78bfa;
+    --text: #e2e8f0;
+    --text-dim: #94a3b8;
+    --text-muted: #64748b;
+  }
+
+  body {
+    font-family: 'Inter', -apple-system, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.7;
+    padding: 0;
+  }
+
+  /* Header */
+  .header {
+    background: linear-gradient(135deg, #0f1629 0%, #1a1f3a 50%, #0f1629 100%);
+    border-bottom: 1px solid var(--border);
+    padding: 3rem 2rem;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .header::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: radial-gradient(ellipse at 50% 0%, var(--accent-glow) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .header h1 {
+    font-size: 2.2rem;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    background: linear-gradient(135deg, #fff 0%, var(--cyan) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 0.5rem;
+  }
+
+  .header .subtitle {
+    font-size: 1rem;
+    color: var(--text-dim);
+    font-weight: 400;
+  }
+
+  .meta-bar {
+    display: flex;
+    justify-content: center;
+    gap: 2rem;
+    margin-top: 1.5rem;
+    flex-wrap: wrap;
+  }
+
+  .meta-item {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: 0.85rem;
+    color: var(--text-muted);
+  }
+
+  .meta-item .label { color: var(--text-dim); font-weight: 500; }
+
+  /* Content */
+  .content {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 2rem 1.5rem 4rem;
+  }
+
+  /* Scene cards */
+  .scene {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    margin-bottom: 2rem;
+    overflow: hidden;
+    transition: border-color 0.3s;
+  }
+
+  .scene:hover {
+    border-color: var(--accent);
+  }
+
+  .scene-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1.2rem 1.5rem;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface-2);
+  }
+
+  .scene-number {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 0.9rem;
+    flex-shrink: 0;
+  }
+
+  .scene:nth-child(1) .scene-number { background: linear-gradient(135deg, var(--red), #dc2626); color: #fff; }
+  .scene:nth-child(2) .scene-number { background: linear-gradient(135deg, var(--accent), #4f46e5); color: #fff; }
+  .scene:nth-child(3) .scene-number { background: linear-gradient(135deg, var(--cyan), #0891b2); color: #0a0e1a; }
+  .scene:nth-child(4) .scene-number { background: linear-gradient(135deg, var(--green), #059669); color: #0a0e1a; }
+
+  .scene-title {
+    font-size: 1.1rem;
+    font-weight: 700;
+    flex: 1;
+  }
+
+  .scene-time {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    background: rgba(255,255,255,0.05);
+    padding: 0.3rem 0.7rem;
+    border-radius: 6px;
+  }
+
+  .scene-body {
+    padding: 1.5rem;
+  }
+
+  /* Visual cue */
+  .visual-cue {
+    background: rgba(34, 211, 238, 0.06);
+    border-left: 3px solid var(--cyan);
+    padding: 0.6rem 1rem;
+    margin-bottom: 1.2rem;
+    border-radius: 0 6px 6px 0;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.8rem;
+    color: var(--cyan);
+  }
+
+  .visual-cue::before {
+    content: 'SHOW';
+    font-weight: 700;
+    margin-right: 0.5rem;
+    opacity: 0.7;
+  }
+
+  /* Voiceover lines */
+  .voiceover {
+    margin-bottom: 1rem;
+  }
+
+  .voiceover p {
+    margin-bottom: 0.6rem;
+    font-size: 1.05rem;
+    line-height: 1.8;
+  }
+
+  .voiceover .emphasis {
+    color: #fff;
+    font-weight: 600;
+  }
+
+  .voiceover .highlight {
+    color: var(--cyan);
+    font-weight: 500;
+  }
+
+  .voiceover .tech {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.9rem;
+    color: var(--purple);
+    background: rgba(167, 139, 250, 0.1);
+    padding: 0.1rem 0.4rem;
+    border-radius: 3px;
+  }
+
+  /* Timeline bar */
+  .timeline {
+    display: flex;
+    margin-bottom: 2rem;
+    border-radius: 8px;
+    overflow: hidden;
+    height: 8px;
+  }
+
+  .timeline-seg {
+    height: 100%;
+    position: relative;
+  }
+
+  .timeline-seg:nth-child(1) { width: 19%; background: var(--red); }
+  .timeline-seg:nth-child(2) { width: 31%; background: var(--accent); }
+  .timeline-seg:nth-child(3) { width: 31%; background: var(--cyan); }
+  .timeline-seg:nth-child(4) { width: 19%; background: var(--green); }
+
+  .timeline-labels {
+    display: flex;
+    margin-bottom: 2rem;
+    font-size: 0.75rem;
+    color: var(--text-muted);
+  }
+
+  .timeline-labels span:nth-child(1) { width: 19%; }
+  .timeline-labels span:nth-child(2) { width: 31%; }
+  .timeline-labels span:nth-child(3) { width: 31%; }
+  .timeline-labels span:nth-child(4) { width: 19%; }
+
+  /* Recording notes */
+  .notes {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-top: 2rem;
+  }
+
+  .notes h3 {
+    font-size: 1rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+    color: var(--amber);
+  }
+
+  .notes-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+  }
+
+  @media (max-width: 640px) {
+    .notes-grid { grid-template-columns: 1fr; }
+  }
+
+  .notes-section h4 {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--text-dim);
+    margin-bottom: 0.5rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .notes-section ul {
+    list-style: none;
+    padding: 0;
+  }
+
+  .notes-section li {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    padding: 0.25rem 0;
+    padding-left: 1.2rem;
+    position: relative;
+  }
+
+  .notes-section li::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0.65rem;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--text-muted);
+  }
+
+  /* Tagline */
+  .tagline {
+    text-align: center;
+    padding: 3rem 1rem;
+    margin-top: 2rem;
+  }
+
+  .tagline p {
+    font-size: 1.4rem;
+    font-weight: 300;
+    color: var(--text-dim);
+    font-style: italic;
+  }
+
+  .tagline p strong {
+    color: var(--cyan);
+    font-weight: 600;
+    font-style: normal;
+  }
+
+  /* Stats row */
+  .stats {
+    display: flex;
+    justify-content: center;
+    gap: 2.5rem;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+  }
+
+  .stat {
+    text-align: center;
+  }
+
+  .stat-value {
+    font-size: 1.8rem;
+    font-weight: 800;
+    background: linear-gradient(135deg, #fff, var(--cyan));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .stat-label {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  /* Separator */
+  .sep {
+    text-align: center;
+    color: var(--text-muted);
+    font-size: 0.8rem;
+    margin: 1.5rem 0;
+    opacity: 0.5;
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>SDL CCIP Bridge</h1>
+  <div class="subtitle">Demo Video Script: Chainlink Convergence Hackathon 2026</div>
+  <div class="meta-bar">
+    <div class="meta-item"><span class="label">Format:</span> Screen recording + voiceover</div>
+    <div class="meta-item"><span class="label">Duration:</span> 2 min 40 sec</div>
+    <div class="meta-item"><span class="label">Tone:</span> Conversational, authoritative</div>
+  </div>
+</div>
+
+<div class="content">
+
+  <div class="stats">
+    <div class="stat"><div class="stat-value">2:40</div><div class="stat-label">Total Duration</div></div>
+    <div class="stat"><div class="stat-value">4</div><div class="stat-label">Scenes</div></div>
+    <div class="stat"><div class="stat-value">83</div><div class="stat-label">Tests Passing</div></div>
+    <div class="stat"><div class="stat-value">7</div><div class="stat-label">Chainlink Products</div></div>
+  </div>
+
+  <div class="timeline"></div>
+  <div class="timeline">
+    <div class="timeline-seg"></div>
+    <div class="timeline-seg"></div>
+    <div class="timeline-seg"></div>
+    <div class="timeline-seg"></div>
+  </div>
+  <div class="timeline-labels">
+    <span>Problem (0:30)</span>
+    <span>What It Does (0:50)</span>
+    <span>How It Connects (0:50)</span>
+    <span>Wrap (0:30)</span>
+  </div>
+
+  <!-- Scene 1 -->
+  <div class="scene">
+    <div class="scene-header">
+      <div class="scene-number">1</div>
+      <div class="scene-title">The Problem</div>
+      <div class="scene-time">0:00 - 0:30</div>
+    </div>
+    <div class="scene-body">
+      <div class="visual-cue">Etherscan bridge contract page, or generic DeFi bridge interface</div>
+      <div class="voiceover">
+        <p><span class="emphasis">Cross-chain bridges move billions.</span></p>
+        <p>But the vaults behind them? Most are black boxes.</p>
+        <p>An LP deposits into a vault. A solver takes liquidity to fill a bridge. The settlement message comes back via CCIP.</p>
+        <p>But what happens in between?</p>
+        <p>Utilization spikes. Redemption queues grow. Bad debt accumulates. Policy parameters drift.</p>
+        <p><span class="emphasis">Nobody's watching the vault health continuously.</span> And when something goes wrong, it's already too late.</p>
+        <p>That's what we built the <span class="highlight">SDL CCIP Bridge</span> to solve.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scene 2 -->
+  <div class="scene">
+    <div class="scene-header">
+      <div class="scene-number">2</div>
+      <div class="scene-title">What It Does</div>
+      <div class="scene-time">0:30 - 1:20</div>
+    </div>
+    <div class="scene-body">
+      <div class="visual-cue">Code editor: LaneVault4626.sol, highlight 5-bucket state variables</div>
+      <div class="voiceover">
+        <p>The core is an <span class="highlight">ERC-4626 vault</span>. LPs deposit assets and earn fees from bridge settlement activity.</p>
+        <p>But this isn't a simple deposit-withdraw vault.</p>
+        <p>It tracks every single wei across <span class="emphasis">five accounting buckets</span>: free liquidity, reserved, in-flight, bad debt reserve, and protocol fees.</p>
+      </div>
+
+      <div class="visual-cue">Architecture diagram from CRE-AI-ARCHITECTURE.md</div>
+      <div class="voiceover">
+        <p>On top of the vault, we built <span class="emphasis">three Chainlink CRE workflows</span>.</p>
+        <p>CRE is Chainlink's Runtime Environment. Think of it as a decentralized server running across Chainlink's oracle network.</p>
+        <p>The first workflow reads all five liquidity buckets every 15 minutes. Utilization, share price, pause state, queue depth. It classifies the vault as OK, Warning, or Critical.</p>
+      </div>
+
+      <div class="visual-cue">bridge_analyze_endpoint.py, highlight AI prompt</div>
+      <div class="voiceover">
+        <p>The second is the <span class="highlight">AI advisor</span>. It reads the same vault state, then sends it to a GPT-5.2 model via HTTPClient.</p>
+        <p>Here's the key: the AI call uses <span class="tech">consensusIdenticalAggregation</span>. That means all DON nodes must get the same AI response before accepting it.</p>
+        <p>The AI recommends policy parameter changes: lower the utilization cap, increase the reserve cut, adjust the hot reserve target.</p>
+      </div>
+
+      <div class="visual-cue">Queue monitor workflow main.ts</div>
+      <div class="voiceover">
+        <p>The third monitors the <span class="highlight">redemption queue</span>. How many LPs are waiting to withdraw? Is there enough free liquidity to cover them? It detects liquidity crunches before they happen.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scene 3 -->
+  <div class="scene">
+    <div class="scene-header">
+      <div class="scene-number">3</div>
+      <div class="scene-title">How It All Connects</div>
+      <div class="scene-time">1:20 - 2:10</div>
+    </div>
+    <div class="scene-body">
+      <div class="visual-cue">Sepolia Etherscan, SentinelRegistry contract, scroll HealthRecorded events</div>
+      <div class="voiceover">
+        <p>Every workflow run produces an <span class="emphasis">on-chain proof</span>.</p>
+        <p>A keccak256 hash of the actual metrics, written to a SentinelRegistry contract on Sepolia.</p>
+        <p>Each proof is tagged with its source: <span class="tech">"vault:ok"</span>, <span class="tech">"advisor:warning"</span>, <span class="tech">"queue:critical"</span>.</p>
+        <p>So you can query the contract and get a permanent, tamper-proof history of every health assessment ever made.</p>
+      </div>
+
+      <div class="visual-cue">Composite intelligence diagram or script output</div>
+      <div class="voiceover">
+        <p>But here's what makes it powerful.</p>
+        <p>After all three workflows complete, a <span class="highlight">composite intelligence layer</span> cross-correlates the data.</p>
+        <p>High utilization alone might be fine. But high utilization, plus a growing queue, plus the AI advisor flagging a risk?</p>
+        <p><span class="emphasis">That's a cascade.</span> And the composite layer catches it before any single monitor would.</p>
+        <p>And that composite assessment also gets its own on-chain proof.</p>
+      </div>
+
+      <div class="visual-cue">Forge test output, all 83 passing</div>
+      <div class="voiceover">
+        <p>On the smart contract side, <span class="emphasis">83 tests passing</span>.</p>
+        <p>Including 8 full lifecycle E2E tests, 15 advanced edge-case audits, and over <span class="highlight">4 million fuzz invariant assertions</span>.</p>
+        <p>Triple security audit. All findings fixed.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scene 4 -->
+  <div class="scene">
+    <div class="scene-header">
+      <div class="scene-number">4</div>
+      <div class="scene-title">Wrap</div>
+      <div class="scene-time">2:10 - 2:40</div>
+    </div>
+    <div class="scene-body">
+      <div class="visual-cue">CHAINLINK.md or Chainlink product table</div>
+      <div class="voiceover">
+        <p>SDL CCIP Bridge uses <span class="emphasis">seven Chainlink products</span>:</p>
+        <p>CCIP for settlement. CRE SDK, EVMClient, HTTPClient, CronCapability for autonomous monitoring. Data Feeds for LINK/USD pricing. And getNetwork for chain selector resolution.</p>
+        <p>All coordinated through one SentinelRegistry contract.</p>
+      </div>
+
+      <div class="visual-cue">GitHub repo overview</div>
+      <div class="voiceover">
+        <p>Built with Solidity, TypeScript, Python, and viem. AI powered by GPT-5.2.</p>
+        <p><span class="emphasis">766 lines</span> of production Solidity. <span class="emphasis">83 tests</span>. Triple audit.</p>
+        <p>This isn't just a bridge vault.</p>
+        <p><span class="highlight">It's a bridge vault that watches itself.</span></p>
+        <p>Autonomous. AI-powered. Verifiable on-chain.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="tagline">
+    <p>"This isn't just a bridge vault. <strong>It's a bridge vault that watches itself.</strong>"</p>
+  </div>
+
+  <!-- Recording Notes -->
+  <div class="notes">
+    <h3>Recording Notes</h3>
+    <div class="notes-grid">
+      <div class="notes-section">
+        <h4>Tabs to Open</h4>
+        <ul>
+          <li>GitHub: Tokenized2027/SDL-CCIP-Bridge</li>
+          <li>Sepolia Etherscan: SentinelRegistry contract</li>
+          <li>Code editor: src/LaneVault4626.sol</li>
+          <li>Terminal: forge test output ready</li>
+        </ul>
+      </div>
+      <div class="notes-section">
+        <h4>Pre-Run Checklist</h4>
+        <ul>
+          <li>Run forge test -vv, save output</li>
+          <li>Open CRE-AI-ARCHITECTURE.md</li>
+          <li>Open bridge_analyze_endpoint.py</li>
+          <li>Verify recent proofs on Etherscan</li>
+        </ul>
+      </div>
+      <div class="notes-section">
+        <h4>Timing Guide</h4>
+        <ul>
+          <li>Scene 1 (Problem): ~30 sec</li>
+          <li>Scene 2 (What it does): ~50 sec</li>
+          <li>Scene 3 (How it connects): ~50 sec</li>
+          <li>Scene 4 (Wrap): ~30 sec</li>
+        </ul>
+      </div>
+      <div class="notes-section">
+        <h4>Delivery Tips</h4>
+        <ul>
+          <li>Pause between scenes for transitions</li>
+          <li>Let test output speak for itself</li>
+          <li>Don't rush the AI consensus part</li>
+          <li>End on the tagline: "watches itself"</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+</body>
+</html>
