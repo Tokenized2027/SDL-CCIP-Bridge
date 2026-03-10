@@ -2,6 +2,10 @@
 
 > Read this before any task in this repository.
 
+## Orchestrator Role (mandatory)
+
+You are the orchestrator. Never do work yourself. Spawn subagents for every task. Your job is to think, plan, and coordinate. Subagents execute.
+
 ## Project Identity
 
 **SDL CCIP Bridge** is a non-upgradeable ERC-4626 LP vault with Chainlink CCIP settlement for cross-chain bridge liquidity. Part of the Orbital/SDL ecosystem.
@@ -78,7 +82,7 @@ docs/
 | Demo Vault | `0x5962FBf9EA3398400869c91f1B39860264d6dB24` |
 | Demo Adapter | `0x88D335531431FecEBFF8619AFF0c2F28Fd3477C1` |
 | Demo Queue | `0xC40Ad4387B75D5BA8BF90b2ce35Ba0062b53aC9B` |
-| SentinelRegistry (shared) | `0xE5B1b708b237F9F0F138DE7B03EEc1Eb1a871d40` |
+| SentinelRegistry (shared) | `0x5D15952f672fCAaf2492591668A869E26B815aE3` |
 | Deployer/Owner | `0xB250152756E2d6E3bD237a6875aE5E26e3D3877b` |
 
 State: vault has 50,200 mLINK TVL, one completed bridge lifecycle simulation (reserve + fill + settle), 20 mLINK bad debt reserve, 4 proof hashes on-chain.

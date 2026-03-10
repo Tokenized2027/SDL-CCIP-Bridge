@@ -179,7 +179,7 @@ const sepoliaNet = getNetwork({ chainFamily: 'evm', chainSelectorName: 'ethereum
 
 All 3 CRE workflows write verifiable proof hashes to a SentinelRegistry contract on Sepolia. Proofs are computed as `keccak256(abi.encode(...workflow-specific metrics))`.
 
-Contract: `0xE5B1b708b237F9F0F138DE7B03EEc1Eb1a871d40` (Sepolia, shared with Orbital Sentinel)
+Contract: `0x5D15952f672fCAaf2492591668A869E26B815aE3` (Sepolia, shared with Orbital Sentinel)
 
 ```solidity
 function recordHealth(bytes32 snapshotHash, string calldata riskLevel) external onlyOwner

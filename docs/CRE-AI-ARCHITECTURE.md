@@ -196,7 +196,7 @@ No single metric is critical. But the combination signals: LPs are trying to exi
 
 ### SentinelRegistry Contract
 
-**Address:** `0xE5B1b708b237F9F0F138DE7B03EEc1Eb1a871d40` (Sepolia)
+**Address:** `0x5D15952f672fCAaf2492591668A869E26B815aE3` (Sepolia)
 
 **Interface:**
 ```solidity

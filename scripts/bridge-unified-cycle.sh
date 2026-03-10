@@ -3,6 +3,8 @@
 # Schedule: 7x/day via cron (0 0 0,3,7,10,14,17,21 * * *)
 set -euo pipefail
 
+export HOME="/home/avi"
+
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROOT_DIR="$(dirname "${SCRIPT_DIR}")"
 DATA_DIR="${ROOT_DIR}/intelligence/data"
@@ -54,6 +56,11 @@ else
 fi
 
 # ─── Phase 2: On-Chain Proof Writes ───
+
+# Load env vars (PRIVATE_KEY, SEPOLIA_RPC_URL, etc.)
+if [ -f "${ROOT_DIR}/.env" ]; then
+  set -a; source "${ROOT_DIR}/.env"; set +a
+fi
 
 echo "[$(date -u '+%H:%M:%S')] Starting proof writes..." | tee -a "${LOG_FILE}"
 if node "${SCRIPT_DIR}/record-bridge-proofs.mjs" >> "${LOG_FILE}" 2>&1; then

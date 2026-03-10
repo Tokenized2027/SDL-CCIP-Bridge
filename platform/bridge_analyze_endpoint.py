@@ -259,5 +259,5 @@ def handle_exception(e):
 
 
 if __name__ == "__main__":
-    port = int(os.environ.get("PORT", "5050"))
+    port = int(os.environ.get("PORT", "5051"))
     app.run(host="127.0.0.1", port=port, debug=False)

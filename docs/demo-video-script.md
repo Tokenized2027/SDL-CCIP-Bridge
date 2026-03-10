@@ -153,7 +153,7 @@ Autonomous. AI-powered. Verifiable on-chain.
 
 **Tabs to have open before recording:**
 1. GitHub repo: `https://github.com/Tokenized2027/SDL-CCIP-Bridge`
-2. Sepolia Etherscan: `https://sepolia.etherscan.io/address/0xE5B1b708b237F9F0F138DE7B03EEc1Eb1a871d40`
+2. Sepolia Etherscan: `https://sepolia.etherscan.io/address/0x5D15952f672fCAaf2492591668A869E26B815aE3`
 3. Code editor with `src/LaneVault4626.sol` open
 4. Terminal with forge test output ready
 

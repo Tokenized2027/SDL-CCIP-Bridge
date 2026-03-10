@@ -225,7 +225,7 @@ This deploys MockERC20 + LaneVault4626 + LaneSettlementAdapter, mints 100k token
 | LaneVault4626 | `0x5962FBf9EA3398400869c91f1B39860264d6dB24` |
 | LaneSettlementAdapter | `0x88D335531431FecEBFF8619AFF0c2F28Fd3477C1` |
 | LaneQueueManager | `0xC40Ad4387B75D5BA8BF90b2ce35Ba0062b53aC9B` |
-| SentinelRegistry | `0xE5B1b708b237F9F0F138DE7B03EEc1Eb1a871d40` |
+| SentinelRegistry | `0x5D15952f672fCAaf2492591668A869E26B815aE3` |
 
 ## Dependencies
 

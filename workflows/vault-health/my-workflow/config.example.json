@@ -6,7 +6,7 @@
 	"assetDecimals": 18,
 	"linkUsdFeedAddress": "0xc59E3633BAAC79493d908e63626716e204A45EdF",
 	"registry": {
-		"address": "0xE5B1b708b237F9F0F138DE7B03EEc1Eb1a871d40",
+		"address": "0x5D15952f672fCAaf2492591668A869E26B815aE3",
 		"chainName": "ethereum-testnet-sepolia"
 	},
 	"thresholds": {

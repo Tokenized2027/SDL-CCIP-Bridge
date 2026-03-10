@@ -708,7 +708,7 @@ The composite intelligence layer can optionally call `POST /api/cre/analyze-brid
 
 Every workflow run produces an immutable on-chain proof: a `HealthRecorded` event on the SentinelRegistry contract containing the keccak256 hash of the workflow's metrics.
 
-**Contract:** `0xE5B1b708b237F9F0F138DE7B03EEc1Eb1a871d40` (Sepolia)
+**Contract:** `0x5D15952f672fCAaf2492591668A869E26B815aE3` (Sepolia)
 
 **Interface:**
 ```solidity
@@ -906,7 +906,7 @@ Queue griefing economics: an attacker creating 1-share redemption requests spend
 | LaneVault4626 | `0x5962FBf9EA3398400869c91f1B39860264d6dB24` |
 | LaneSettlementAdapter | `0x88D335531431FecEBFF8619AFF0c2F28Fd3477C1` |
 | LaneQueueManager | `0xC40Ad4387B75D5BA8BF90b2ce35Ba0062b53aC9B` |
-| SentinelRegistry | `0xE5B1b708b237F9F0F138DE7B03EEc1Eb1a871d40` |
+| SentinelRegistry | `0x5D15952f672fCAaf2492591668A869E26B815aE3` |
 
 State: vault has 50,200 mLINK TVL, one completed bridge lifecycle simulation (reserve + fill + settle), 20 mLINK bad debt reserve, 4 proof hashes on-chain.
 
