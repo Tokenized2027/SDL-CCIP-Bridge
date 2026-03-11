@@ -181,12 +181,14 @@ contract LaneVault4626 is ERC4626, AccessControlDefaultAdminRules, ReentrancyGua
   }
 
   function maxWithdraw(address owner) public view override returns (uint256) {
+    if (globalPaused) return 0;
     uint256 ownerAssets = previewRedeem(balanceOf(owner));
     uint256 available = availableFreeLiquidityForLP();
     return ownerAssets < available ? ownerAssets : available;
   }
 
   function maxRedeem(address owner) public view override returns (uint256) {
+    if (globalPaused) return 0;
     uint256 maxAssets = maxWithdraw(owner);
     if (maxAssets == 0) return 0;
     uint256 equivalentShares = convertToShares(maxAssets);

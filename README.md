@@ -97,6 +97,7 @@ None -> Executed -> SettledSuccess
 - **2-step admin transfer:** Via `AccessControlDefaultAdminRules` with configurable timelock
 - **Emergency release:** 72h default timelock for stuck in-flight fills
 - **Permissionless expiry:** Anyone can release expired reservations
+- **Pause-safe ERC-4626 views:** `maxDeposit()` / `maxMint()` return `0` when deposits are blocked, and `maxWithdraw()` / `maxRedeem()` return `0` during `globalPaused`
 
 ### Settlement Adapter Security
 
@@ -118,7 +119,7 @@ None -> Executed -> SettledSuccess
 
 ## Test Suite
 
-**83 tests passing** across 11 test files, including fuzz, invariant, attack scenario, and full lifecycle E2E coverage.
+**84 tests passing** across 12 test files, including fuzz, invariant, attack scenario, and full lifecycle E2E coverage.
 
 | File | Tests | Category |
 |------|-------|----------|
@@ -133,6 +134,7 @@ None -> Executed -> SettledSuccess
 | `DeepAudit.t.sol` | 11 | Deep audit: balance coverage, phantom assets, ERC-4626 compliance |
 | `AdvancedAudit.t.sol` | 15 | Advanced edge cases: ADV-01 to ADV-15 |
 | `E2E.t.sol` | 8 | Full lifecycle E2E: E2E-01 to E2E-08 |
+| `ScanCampaignFindings.t.sol` | 1 | Regression coverage for March 2026 scan remediation |
 
 **Invariant coverage:** 4.16M assertions across 480K action sequences at audit-grade (10,000 fuzz runs).
 
