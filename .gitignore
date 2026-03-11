@@ -41,3 +41,5 @@ scripts/.last-bridge-write-state.json
 __pycache__/
 *.pyc
 platform/venv/
+.venv/
+foundry.lock
