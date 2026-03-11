@@ -35,6 +35,8 @@ workflows/*/my-workflow/config.staging.json
 workflows/*/my-workflow/.cre_build_tmp.js
 workflows/*/my-workflow/binary.wasm.br.b64
 intelligence/data/
+intelligence/logs/
+package-lock.json
 scripts/.last-bridge-write-state.json
 
 # Python
