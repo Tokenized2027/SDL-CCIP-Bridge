@@ -11,7 +11,7 @@
 | GitHub | https://github.com/Tokenized2027/SDL-CCIP-Bridge |
 | Demo Video | https://www.youtube.com/watch?v=6fGbyOTxOS8 |
 | Chainlink Usage | https://github.com/Tokenized2027/SDL-CCIP-Bridge/blob/main/CHAINLINK.md |
-| Contract (Sepolia) | https://sepolia.etherscan.io/address/0x5D15952f672fCAaf2492591668A869E26B815aE3 |
+| Contract (Sepolia) | https://sepolia.etherscan.io/address/0x35EFB15A46Fa63262dA1c4D8DE02502Dd8b6E3a5 |
 | CRE Registry (Mainnet) | https://etherscan.io/address/0x4Ac54353FA4Fa961AfcC5ec4B118596d3305E7e5 |
 
 ---

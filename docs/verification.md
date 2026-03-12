@@ -2,7 +2,7 @@
 
 ## What the On-Chain Proofs Prove
 
-Every CRE workflow run produces a **keccak256 hash** that is written to the [SentinelRegistry contract on Sepolia](https://sepolia.etherscan.io/address/0x5D15952f672fCAaf2492591668A869E26B815aE3).
+Every CRE workflow run produces a **keccak256 hash** that is written to the [SentinelRegistry contract on Sepolia](https://sepolia.etherscan.io/address/0x35EFB15A46Fa63262dA1c4D8DE02502Dd8b6E3a5).
 
 Each record proves:
 
@@ -88,7 +88,7 @@ import { sepolia } from 'viem/chains';
 const client = createPublicClient({ chain: sepolia, transport: http() });
 
 const logs = await client.getLogs({
-  address: '0x5D15952f672fCAaf2492591668A869E26B815aE3',
+  address: '0x35EFB15A46Fa63262dA1c4D8DE02502Dd8b6E3a5',
   event: {
     type: 'event',
     name: 'HealthRecorded',
@@ -158,7 +158,7 @@ The value isn't just the hashing (you could hash data without CRE). CRE provides
 | Field | Value |
 |-------|-------|
 | Contract | `SentinelRegistry` (shared with Orbital Sentinel) |
-| Address | `0x5D15952f672fCAaf2492591668A869E26B815aE3` |
+| Address | `0x35EFB15A46Fa63262dA1c4D8DE02502Dd8b6E3a5` |
 | Network | Sepolia Testnet |
 | Solidity | 0.8.19 |
 | Key Function | `recordHealth(bytes32 snapshotHash, string riskLevel)` |
@@ -167,7 +167,7 @@ The value isn't just the hashing (you could hash data without CRE). CRE provides
 | Access | Owner-only `recordHealth` (Ownable2Step) |
 | Deduplication | `mapping(bytes32 => bool)`, reverts `AlreadyRecorded` on duplicates |
 | Input validation | `EmptyRiskLevel` on empty string, `RiskLevelTooLong` on > 256 bytes |
-| Etherscan | [View on Sepolia](https://sepolia.etherscan.io/address/0x5D15952f672fCAaf2492591668A869E26B815aE3) |
+| Etherscan | [View on Sepolia](https://sepolia.etherscan.io/address/0x35EFB15A46Fa63262dA1c4D8DE02502Dd8b6E3a5) |
 
 ## Risk Level Format
 

@@ -17,7 +17,7 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const DATA_DIR = join(__dirname, '..', 'intelligence', 'data');
 const STATE_FILE = join(__dirname, '.last-bridge-write-state.json');
 
-const REGISTRY_ADDRESS = process.env.REGISTRY_ADDRESS || '0x5D15952f672fCAaf2492591668A869E26B815aE3';
+const REGISTRY_ADDRESS = process.env.REGISTRY_ADDRESS || '0x35EFB15A46Fa63262dA1c4D8DE02502Dd8b6E3a5';
 const RPC_URL = process.env.SEPOLIA_RPC_URL || 'https://ethereum-sepolia-rpc.publicnode.com';
 const PRIVATE_KEY = process.env.PRIVATE_KEY;
 

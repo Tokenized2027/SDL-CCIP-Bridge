@@ -708,7 +708,7 @@ The composite intelligence layer can optionally call `POST /api/cre/analyze-brid
 
 Every workflow run produces an immutable on-chain proof: a `HealthRecorded` event on the SentinelRegistry contract containing the keccak256 hash of the workflow's metrics.
 
-**Contract:** `0x5D15952f672fCAaf2492591668A869E26B815aE3` (Sepolia)
+**Contract:** `0x35EFB15A46Fa63262dA1c4D8DE02502Dd8b6E3a5` (Sepolia)
 
 **Interface:**
 ```solidity
@@ -902,13 +902,13 @@ Queue griefing economics: an attacker creating 1-share redemption requests spend
 
 | Contract | Address |
 |----------|---------|
-| MockERC20 (mLINK) | `0xf59f724C38BdDe189DEe900aD05305ca007161ed` |
-| LaneVault4626 | `0x5962FBf9EA3398400869c91f1B39860264d6dB24` |
-| LaneSettlementAdapter | `0x88D335531431FecEBFF8619AFF0c2F28Fd3477C1` |
-| LaneQueueManager | `0xC40Ad4387B75D5BA8BF90b2ce35Ba0062b53aC9B` |
-| SentinelRegistry | `0x5D15952f672fCAaf2492591668A869E26B815aE3` |
+| MockERC20 (mLINK) | `0xA38192Da87f54bD2BdBB532C94093b976aE92935` |
+| LaneVault4626 | `0x7F39D5C6266d1A339e07D3Fa34185F4A2ca282cb` |
+| LaneSettlementAdapter | `0x8e7bc1e0BecC18eb21E1554D7e0a52C5443F6a1f` |
+| LaneQueueManager | `0x578DDa4c2702bAB7387eD23b42151ba557B22A8E` |
+| SentinelRegistry | `0x35EFB15A46Fa63262dA1c4D8DE02502Dd8b6E3a5` |
 
-State: vault has 50,200 mLINK TVL, one completed bridge lifecycle simulation (reserve + fill + settle), 20 mLINK bad debt reserve, 4 proof hashes on-chain.
+State: fresh Sepolia deployment with 50,000 mLINK deposited for testing. The lifecycle simulation and proof backfill have not been replayed on this deployment yet.
 
 ### 17.2 CRE Workflows (Ethereum Mainnet)
 

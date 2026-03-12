@@ -1,8 +1,8 @@
 {
 	"schedule": "0 */30 * * * *",
 	"chainName": "ethereum-testnet-sepolia",
-	"vaultAddress": "0x5962FBf9EA3398400869c91f1B39860264d6dB24",
-	"queueManagerAddress": "0xC40Ad4387B75D5BA8BF90b2ce35Ba0062b53aC9B",
+	"vaultAddress": "0x7F39D5C6266d1A339e07D3Fa34185F4A2ca282cb",
+	"queueManagerAddress": "0x578DDa4c2702bAB7387eD23b42151ba557B22A8E",
 	"assetDecimals": 18,
 	"linkUsdFeedAddress": "0xc59E3633BAAC79493d908e63626716e204A45EdF",
 	"aiEndpoint": {
@@ -11,7 +11,7 @@
 		"enabled": true
 	},
 	"registry": {
-		"address": "0x5D15952f672fCAaf2492591668A869E26B815aE3",
+		"address": "0x35EFB15A46Fa63262dA1c4D8DE02502Dd8b6E3a5",
 		"chainName": "ethereum-testnet-sepolia"
 	}
 }
