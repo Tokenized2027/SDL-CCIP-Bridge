@@ -20,7 +20,7 @@ import { fileURLToPath } from 'url';
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const DATA_DIR = join(__dirname, '..', 'intelligence', 'data');
 const OUTPUT_FILE = join(DATA_DIR, 'cre_bridge_composite_snapshot.json');
-const AI_ENDPOINT = process.env.AI_ENDPOINT || 'http://localhost:5051/api/cre/analyze-bridge-composite';
+const AI_ENDPOINT = process.env.AI_ENDPOINT || 'http://127.0.0.1:5050/api/cre/analyze-bridge-composite';
 const AI_ENABLED = process.env.AI_ENABLED !== 'false';
 
 // ─── Load snapshots ───
