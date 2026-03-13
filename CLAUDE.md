@@ -83,7 +83,7 @@ docs/
 | Demo Adapter | `0x8e7bc1e0BecC18eb21E1554D7e0a52C5443F6a1f` |
 | Demo Queue | `0x578DDa4c2702bAB7387eD23b42151ba557B22A8E` |
 | SentinelRegistry (shared) | `0x35EFB15A46Fa63262dA1c4D8DE02502Dd8b6E3a5` |
-| Deployer/Owner | `0xB250152756E2d6E3bD237a6875aE5E26e3D3877b` |
+| Deployer/Owner | `0x703Ca5d857e5eF57B445a0810741b45C80FAe3a8` |
 
 State: fresh Sepolia deployment with 50,000 mLINK deposited for testing. The lifecycle simulation and proof backfill have not been replayed on this deployment yet.
 
@@ -97,7 +97,7 @@ All 3 workflows registered on the Chainlink Workflow Registry (`0x4Ac54353FA4Fa9
 | bridge-ai-advisor | `00460bc80aef935e416083628b1f00f82c1014f5dcc4e42f847832da2951911f` | `0xd9a942ffc080d140481e2920921b8e623573cdb528e47d7ce60ebe92cea9512e` |
 | queue-monitor | `00f900d3da87de6cb1b4bf3a7be2dd550e090f8bbb6a96841275307d20b61e72` | `0x3e1629cd7401a6086784423118983fe9b31ce5e1f17b4f526a147f89fde94fb5` |
 
-Owner: `0xB250152756E2d6E3bD237a6875aE5E26e3D3877b`. CRE user: `[REDACTED]`.
+Owner: `0x703Ca5d857e5eF57B445a0810741b45C80FAe3a8`. CRE user: `[REDACTED]`.
 
 ## CRE Workflow Rules
 

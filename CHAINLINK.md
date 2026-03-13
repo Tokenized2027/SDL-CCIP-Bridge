@@ -222,7 +222,7 @@ All 3 workflows are registered on the Chainlink Workflow Registry contract at `0
 | bridge-ai-advisor-staging | `00460bc80aef935e416083628b1f00f82c1014f5dcc4e42f847832da2951911f` | `0xd9a942ff...` |
 | queue-monitor-staging | `00f900d3da87de6cb1b4bf3a7be2dd550e090f8bbb6a96841275307d20b61e72` | `0x3e1629cd...` |
 
-Each workflow was compiled to WASM, uploaded to `storage.cre.chain.link`, and registered via `UpsertWorkflow`. Owner: `0xB250152756E2d6E3bD237a6875aE5E26e3D3877b`.
+Each workflow was compiled to WASM, uploaded to `storage.cre.chain.link`, and registered via `UpsertWorkflow`. Owner: `0x703Ca5d857e5eF57B445a0810741b45C80FAe3a8`.
 
 ---
 
