@@ -40,7 +40,7 @@ This deep re-audit covered **2,121 nSLOC** across three Solidity systems that ha
 |--------|------|-------|------|------------|---------------|-----------|
 | stLINK Arb Vault | `clients/stake-link/arb-vault/contracts/` | 1,303 | 0.8.24 | 5.1.0 | 168 (1.73M invariant assertions) | 10 |
 | CCIP Bridge (LaneVault4626) | `src/` | ~800 | 0.8.24 | 5.0.2 | 39 → 83 total (4.16M invariant assertions) | 11 (+33 post deep-audit) |
-| Sentinel Registry | `~/orbital-sentinel/contracts/` | ~90 | 0.8.19 | N/A | 24 → 31 total (70K fuzz iterations) | 7 |
+| Sentinel Registry | `<sentinel-repo>/contracts/` | ~90 | 0.8.19 | N/A | 24 → 31 total (70K fuzz iterations) | 7 |
 
 ---
 

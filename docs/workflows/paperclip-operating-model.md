@@ -1,15 +1,15 @@
-# Paperclip Operating Model
+# Agent Team Operating Model
 
 ## Ownership Model (Explicit)
 
 - Product/business ownership and final prioritization: **Product Owner**.
-- Execution and implementation throughput: **Paperclip AI team**.
+- Execution and implementation throughput: **AI Development Team**.
 - If execution preference conflicts with product direction, **Product Owner's decision is final**.
 
 ## How Work Runs
 
 - Product Owner sets direction, constraints, and acceptance criteria.
-- Paperclip executes by role (PM, design, frontend, backend, AI, QA, ops).
+- Agent Team executes by role (PM, design, frontend, backend, AI, QA, ops).
 - Delivery is measured by shipped behavior, evidence, and quality gates.
 
 ## Required Execution Rules

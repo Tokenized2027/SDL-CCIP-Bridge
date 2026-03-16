@@ -3,7 +3,7 @@
 # Schedule: 7x/day via cron (0 0 0,3,7,10,14,17,21 * * *)
 set -euo pipefail
 
-export HOME="/home/avi"
+export HOME="${HOME:-/home/$(whoami)}"
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROOT_DIR="$(dirname "${SCRIPT_DIR}")"

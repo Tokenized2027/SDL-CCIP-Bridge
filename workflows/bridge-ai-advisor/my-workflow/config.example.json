@@ -6,7 +6,7 @@
 	"assetDecimals": 18,
 	"linkUsdFeedAddress": "0xc59E3633BAAC79493d908e63626716e204A45EdF",
 	"aiEndpoint": {
-		"url": "https://sentinel-ai.schuna.co.il/api/cre/analyze-bridge",
+		"url": "https://your-sentinel-api.example.com/api/cre/analyze-bridge",
 		"creSecret": "YOUR_CRE_SECRET",
 		"enabled": true
 	},

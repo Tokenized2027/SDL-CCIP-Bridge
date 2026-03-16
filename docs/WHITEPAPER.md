@@ -924,7 +924,7 @@ All 3 workflows registered on the Chainlink Workflow Registry (`0x4Ac54353FA4Fa9
 
 | Field | Value |
 |-------|-------|
-| URL | `sentinel-ai.schuna.co.il/api/cre/analyze-bridge` |
+| URL | `your-sentinel-api.example.com/api/cre/analyze-bridge` |
 | Model | GPT-5.2 |
 | Auth | `X-CRE-Secret` header |
 | Cost | ~$0.003-0.005 per call |
