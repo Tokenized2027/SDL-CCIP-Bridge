@@ -21,6 +21,7 @@ contract LaneQueueManager {
   address public immutable vault;
   uint256 public headRequestId;
   uint256 public tailRequestId;
+  uint256 private _nextRequestId;
 
   mapping(uint256 => RedeemRequest) private _requests;
 
@@ -40,7 +41,7 @@ contract LaneQueueManager {
   function enqueue(address owner, address receiver, uint256 shares) external onlyVault returns (uint256 requestId) {
     if (owner == address(0) || receiver == address(0) || shares == 0) revert InvalidRequest();
 
-    requestId = tailRequestId + 1;
+    requestId = ++_nextRequestId;
     tailRequestId = requestId;
     if (headRequestId == 0) {
       headRequestId = requestId;

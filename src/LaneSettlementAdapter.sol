@@ -44,6 +44,7 @@ contract LaneSettlementAdapter is CCIPReceiver {
   );
 
   constructor(address router, ILaneVaultSettlement vault_) CCIPReceiver(router) {
+    require(address(vault_) != address(0), "LaneSettlementAdapter: zero vault address");
     vault = vault_;
   }
 

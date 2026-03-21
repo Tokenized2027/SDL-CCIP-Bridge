@@ -37,6 +37,7 @@ contract DeployLaneVault is Script {
     address ccipRouter = vm.envAddress("CCIP_ROUTER");
     address initialAdmin = vm.envAddress("INITIAL_ADMIN");
     uint48 defaultAdminDelay = uint48(vm.envUint("DEFAULT_ADMIN_DELAY"));
+    require(defaultAdminDelay >= 2 days, "Admin delay too short for production");
 
     console.log("=== LaneVault4626 Paused Deploy ===");
     console.log("Asset:", asset);

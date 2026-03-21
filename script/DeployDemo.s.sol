@@ -33,6 +33,8 @@ contract DeployLaneVaultDemo is Script {
     console.log("Minted 100,000 mLINK to deployer");
 
     // 3. Deploy vault
+    // WARNING: defaultAdminDelay = 0 is TESTNET ONLY
+    // Production deployment MUST use defaultAdminDelay >= 2 days with a multisig admin
     LaneVault4626 vault = new LaneVault4626(
       IERC20(address(token)),
       "Lane Vault LP (Demo)",
