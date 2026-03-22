@@ -126,6 +126,7 @@ contract LaneVault4626 is ERC4626, AccessControlDefaultAdminRules, ReentrancyGua
 
   error EmergencyReleaseNotReady(bytes32 fillId, uint256 readyAt);
   error EmergencyReleaseDelayTooShort();
+  error EmergencyReleaseDelayTooLong();
 
   uint48 public emergencyReleaseDelay = 3 days;
 
@@ -238,7 +239,7 @@ contract LaneVault4626 is ERC4626, AccessControlDefaultAdminRules, ReentrancyGua
   ) external onlyRole(GOVERNANCE_ROLE) {
     uint16 clampedReserveCut = _clampBps(badDebtReserveCutBps_);
     uint16 clampedProtocolFee = _clampBps(protocolFeeBps_);
-    if (uint256(clampedReserveCut) + uint256(clampedProtocolFee) > BPS_DENOMINATOR) {
+    if (uint256(clampedReserveCut) + uint256(clampedProtocolFee) >= BPS_DENOMINATOR) {
       revert CombinedFeeBpsExceedsDenominator();
     }
 
@@ -593,6 +594,7 @@ contract LaneVault4626 is ERC4626, AccessControlDefaultAdminRules, ReentrancyGua
 
   function setEmergencyReleaseDelay(uint48 newDelay) external onlyRole(GOVERNANCE_ROLE) {
     if (newDelay < 1 days) revert EmergencyReleaseDelayTooShort();
+    if (newDelay > 30 days) revert EmergencyReleaseDelayTooLong();
     emergencyReleaseDelay = newDelay;
     emit EmergencyReleaseDelayUpdated(newDelay);
   }
