@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ottomatt Security Audit — {{DATE}}</title>
+  <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Heebo', sans-serif;
+      background: #f6f1e8;
+      color: #16212B;
+      font-size: 18px;
+      line-height: 1.6;
+    }
+    h1, h2, h3, h4 { color: #1b465f; font-weight: 700; }
+    h1 { font-size: 32px; }
+    h2 { font-size: 26px; margin: 32px 0 16px; border-bottom: 3px solid #c27d2f; padding-bottom: 8px; }
+    h3 { font-size: 22px; margin: 24px 0 12px; }
+    a { color: #1b465f; text-decoration: underline; }
+
+    .container { max-width: 1100px; margin: 0 auto; padding: 24px; }
+
+    /* Header */
+    .header {
+      background: #1b465f;
+      color: #FFFFFF;
+      padding: 40px 24px;
+      text-align: center;
+    }
+    .header h1 { color: #FFFFFF; font-size: 36px; }
+    .header .subtitle { color: #c27d2f; font-size: 20px; margin-top: 8px; }
+    .header .date { color: #FFFFFF; font-size: 16px; margin-top: 4px; opacity: 0.9; }
+
+    /* Score Badge */
+    .score-section {
+      background: #1b465f;
+      color: #FFFFFF;
+      padding: 32px;
+      border-radius: 12px;
+      margin: 24px 0;
+      text-align: center;
+    }
+    .score-number {
+      font-size: 72px;
+      font-weight: 800;
+      color: #c27d2f;
+      line-height: 1;
+    }
+    .score-label { font-size: 20px; color: #FFFFFF; margin-top: 8px; }
+
+    /* Stat Grid */
+    .stat-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      margin: 24px 0;
+    }
+    .stat-card {
+      padding: 20px;
+      border-radius: 8px;
+      text-align: center;
+    }
+    .stat-card .count { font-size: 42px; font-weight: 800; line-height: 1; }
+    .stat-card .label { font-size: 16px; font-weight: 500; margin-top: 4px; }
+    .stat-critical { background: #d32f2f; color: #FFFFFF; }
+    .stat-critical .count { color: #FFFFFF; }
+    .stat-critical .label { color: #FFFFFF; }
+    .stat-high { background: #e65100; color: #FFFFFF; }
+    .stat-high .count { color: #FFFFFF; }
+    .stat-high .label { color: #FFFFFF; }
+    .stat-medium { background: #c27d2f; color: #FFFFFF; }
+    .stat-medium .count { color: #FFFFFF; }
+    .stat-medium .label { color: #FFFFFF; }
+    .stat-low { background: #1b465f; color: #FFFFFF; }
+    .stat-low .count { color: #FFFFFF; }
+    .stat-low .label { color: #FFFFFF; }
+
+    /* Delta Grid */
+    .delta-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      margin: 24px 0;
+    }
+    .delta-card {
+      padding: 16px;
+      border-radius: 8px;
+      text-align: center;
+      border: 2px solid #1b465f;
+    }
+    .delta-card .count { font-size: 32px; font-weight: 700; color: #1b465f; }
+    .delta-card .label { font-size: 14px; color: #16212B; }
+
+    /* Badges */
+    .badge {
+      display: inline-block;
+      padding: 2px 10px;
+      border-radius: 4px;
+      font-size: 13px;
+      font-weight: 600;
+      color: #FFFFFF;
+      text-transform: uppercase;
+    }
+    .badge-critical { background: #d32f2f; }
+    .badge-high { background: #e65100; }
+    .badge-medium { background: #c27d2f; }
+    .badge-low { background: #1b465f; }
+    .badge-pass { background: #2e7d32; }
+    .badge-new { background: #1b465f; }
+    .badge-recurring { background: #c27d2f; }
+    .badge-resolved { background: #2e7d32; }
+    .badge-regressed { background: #d32f2f; }
+
+    /* Finding Cards */
+    .finding-card {
+      background: #FFFFFF;
+      border-radius: 8px;
+      padding: 20px;
+      margin: 16px 0;
+      border-left: 5px solid #1b465f;
+    }
+    .finding-card.critical { border-left-color: #d32f2f; }
+    .finding-card.high { border-left-color: #e65100; }
+    .finding-card.medium { border-left-color: #c27d2f; }
+    .finding-card.low { border-left-color: #1b465f; }
+    .finding-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+    .finding-id { font-weight: 700; font-size: 16px; color: #1b465f; }
+    .finding-title { font-weight: 600; font-size: 18px; color: #16212B; margin-bottom: 8px; }
+    .finding-file { font-family: monospace; font-size: 15px; color: #1b465f; margin: 4px 0; }
+    .finding-evidence {
+      background: #f6f1e8;
+      padding: 12px;
+      border-radius: 4px;
+      font-size: 15px;
+      margin: 8px 0;
+      color: #16212B;
+    }
+    .finding-fix {
+      border-top: 1px solid #f6f1e8;
+      padding-top: 12px;
+      margin-top: 12px;
+      color: #16212B;
+    }
+    .finding-fix strong { color: #1b465f; }
+
+    /* Attack Path Cards */
+    .attack-path {
+      background: #FFFFFF;
+      border: 3px solid #c27d2f;
+      border-radius: 8px;
+      padding: 20px;
+      margin: 16px 0;
+    }
+    .attack-path h4 { color: #c27d2f; }
+
+    /* Positives */
+    .positive-card {
+      background: #e8f5e9;
+      border-radius: 8px;
+      padding: 16px;
+      margin: 12px 0;
+      border-left: 5px solid #2e7d32;
+      color: #16212B;
+    }
+
+    /* Master Table */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 16px 0;
+      font-size: 16px;
+    }
+    th {
+      background: #1b465f;
+      color: #FFFFFF;
+      padding: 12px 16px;
+      text-align: left;
+      font-weight: 600;
+    }
+    td {
+      padding: 10px 16px;
+      border-bottom: 1px solid #e0d8cc;
+      color: #16212B;
+    }
+    tr:hover { background: #ede7db; }
+
+    /* TOC */
+    .toc {
+      background: #FFFFFF;
+      border-radius: 8px;
+      padding: 20px;
+      margin: 24px 0;
+    }
+    .toc a { color: #1b465f; text-decoration: none; display: block; padding: 4px 0; }
+    .toc a:hover { color: #c27d2f; }
+
+    /* Footer */
+    .footer {
+      text-align: center;
+      padding: 24px;
+      color: #1b465f;
+      font-size: 14px;
+      border-top: 2px solid #c27d2f;
+      margin-top: 48px;
+    }
+
+    @media (max-width: 768px) {
+      .stat-grid, .delta-grid { grid-template-columns: repeat(2, 1fr); }
+      .score-number { font-size: 48px; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="header">
+  <h1>Ottomatt Platform Security Audit</h1>
+  <div class="subtitle">Comprehensive 10-Workstream Analysis</div>
+  <div class="date">{{DATE}} | {{SERVICE_COUNT}} services | {{CHECK_COUNT}} checks executed</div>
+</div>
+
+<div class="container">
+
+  <!-- SCORE -->
+  <div class="score-section">
+    <div class="score-number">{{SCORE}}</div>
+    <div class="score-label">Security Posture Score (0 to 100)</div>
+  </div>
+
+  <!-- SEVERITY STATS -->
+  <div class="stat-grid">
+    <div class="stat-card stat-critical">
+      <div class="count">{{CRITICAL_COUNT}}</div>
+      <div class="label">Critical</div>
+    </div>
+    <div class="stat-card stat-high">
+      <div class="count">{{HIGH_COUNT}}</div>
+      <div class="label">High</div>
+    </div>
+    <div class="stat-card stat-medium">
+      <div class="count">{{MEDIUM_COUNT}}</div>
+      <div class="label">Medium</div>
+    </div>
+    <div class="stat-card stat-low">
+      <div class="count">{{LOW_COUNT}}</div>
+      <div class="label">Low</div>
+    </div>
+  </div>
+
+  <!-- DELTA (if prior audit exists) -->
+  <!-- {{DELTA_SECTION_START}} -->
+  <h2>Changes Since Last Audit</h2>
+  <div class="delta-grid">
+    <div class="delta-card">
+      <div class="count">{{NEW_COUNT}}</div>
+      <div class="label">New Findings</div>
+    </div>
+    <div class="delta-card">
+      <div class="count">{{RECURRING_COUNT}}</div>
+      <div class="label">Recurring</div>
+    </div>
+    <div class="delta-card">
+      <div class="count">{{RESOLVED_COUNT}}</div>
+      <div class="label">Resolved</div>
+    </div>
+    <div class="delta-card">
+      <div class="count">{{REGRESSED_COUNT}}</div>
+      <div class="label">Regressed</div>
+    </div>
+  </div>
+  <!-- {{DELTA_SECTION_END}} -->
+
+  <!-- TABLE OF CONTENTS -->
+  <div class="toc">
+    <h3>Contents</h3>
+    <a href="#critical-findings">Critical Findings</a>
+    <a href="#high-findings">High Findings</a>
+    <a href="#medium-findings">Medium Findings</a>
+    <a href="#low-findings">Low Findings</a>
+    <a href="#attack-paths">Attack Paths</a>
+    <a href="#positives">What's Working Well</a>
+    <a href="#fix-order">Priority Fix Order</a>
+    <a href="#master-table">Master Finding Table</a>
+    <a href="#appendix">Appendix</a>
+  </div>
+
+  <!-- CRITICAL FINDINGS -->
+  <h2 id="critical-findings">Critical Findings</h2>
+  <!-- {{CRITICAL_FINDINGS}} -->
+
+  <!-- HIGH FINDINGS -->
+  <h2 id="high-findings">High Findings</h2>
+  <!-- {{HIGH_FINDINGS}} -->
+
+  <!-- MEDIUM FINDINGS -->
+  <h2 id="medium-findings">Medium Findings</h2>
+  <!-- {{MEDIUM_FINDINGS}} -->
+
+  <!-- LOW FINDINGS -->
+  <h2 id="low-findings">Low Findings</h2>
+  <!-- {{LOW_FINDINGS}} -->
+
+  <!-- ATTACK PATHS -->
+  <h2 id="attack-paths">Compound Attack Paths</h2>
+  <p>These chains combine findings from multiple workstreams into higher-impact scenarios.</p>
+  <!-- {{ATTACK_PATHS}} -->
+
+  <!-- POSITIVES -->
+  <h2 id="positives">What's Working Well</h2>
+  <!-- {{POSITIVES}} -->
+
+  <!-- PRIORITY FIX ORDER -->
+  <h2 id="fix-order">Priority Fix Order</h2>
+  <p>Recommended remediation sequence based on severity, exploitability, and dependencies.</p>
+  <!-- {{FIX_ORDER}} -->
+
+  <!-- MASTER TABLE -->
+  <h2 id="master-table">Master Finding Table</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Name</th>
+        <th>Severity</th>
+        <th>Status</th>
+        <th>Workstream</th>
+        <th>CVE</th>
+        <th>Delta</th>
+      </tr>
+    </thead>
+    <tbody>
+      <!-- {{MASTER_TABLE_ROWS}} -->
+    </tbody>
+  </table>
+
+  <!-- APPENDIX -->
+  <h2 id="appendix">Appendix</h2>
+  <table>
+    <tr><th>Item</th><th>Value</th></tr>
+    <tr><td>Audit Date</td><td>{{DATE}}</td></tr>
+    <tr><td>Repository</td><td>{{REPO_ROOT}}</td></tr>
+    <tr><td>Services Audited</td><td>{{SERVICE_COUNT}}</td></tr>
+    <tr><td>Total Checks</td><td>{{CHECK_COUNT}}</td></tr>
+    <tr><td>Workstreams</td><td>AUTH, RLS, EXT, INFRA, CI, INPUT, AI, SEC, RATE, MISC</td></tr>
+    <tr><td>Trail of Bits Skills Used</td><td>insecure-defaults, sharp-edges, supply-chain-risk-auditor, agentic-actions-auditor, variant-analysis, entry-point-analyzer, second-opinion</td></tr>
+    <tr><td>CVE Database</td><td>March 2026</td></tr>
+    <tr><td>Dynamic Testing</td><td>{{PENTAGI_STATUS}}</td></tr>
+    <tr><td>Prior Audit</td><td>{{PRIOR_AUDIT}}</td></tr>
+    <tr><td>Agent Execution Time</td><td>{{EXECUTION_TIME}}</td></tr>
+  </table>
+
+</div>
+
+<div class="footer">
+  Ottomatt Security Audit | Generated by /security-audit skill | {{DATE}}
+</div>
+
+</body>
+</html>
