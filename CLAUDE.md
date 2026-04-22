@@ -16,7 +16,7 @@ You are the orchestrator. Never do work yourself. Spawn subagents for every task
 2. **OpenZeppelin version is `5.0.2`** -- do not upgrade without explicit approval
 3. **No proxy patterns** -- contracts are immutable by design
 4. **All state-mutating functions must have `nonReentrant`** -- no exceptions
-5. **Run `forge test -vv` before any commit** -- all 83 tests must pass
+5. **Run `forge test -vv` before any commit** -- all 84 tests must pass
 6. **Run `forge fmt --check` before any commit** -- formatting must be clean
 7. **Never modify `_assertAccountingInvariants()` without adding corresponding test coverage**
 8. **Conventional commits:** `feat:`, `fix:`, `docs:`, `chore:`, `test:`
