@@ -227,7 +227,7 @@ This deploys MockERC20 + LaneVault4626 + LaneSettlementAdapter, mints 100k token
 | LaneVault4626 | `0x7F39D5C6266d1A339e07D3Fa34185F4A2ca282cb` |
 | LaneSettlementAdapter | `0x8e7bc1e0BecC18eb21E1554D7e0a52C5443F6a1f` |
 | LaneQueueManager | `0x578DDa4c2702bAB7387eD23b42151ba557B22A8E` |
-| SentinelRegistry | `0x35EFB15A46Fa63262dA1c4D8DE02502Dd8b6E3a5` |
+| SentinelRegistry | `0x35EFB15A46Fa63262dA1c4D8DE02502Dd8b6E3a5` (ABI in `workflows/*/contracts/abi/SentinelRegistry.ts`, source maintained in a separate operational repo) |
 
 ## Dependencies
 
