@@ -1,0 +1,4 @@
+interface:
+  display_name: "STANDARDIZOR"
+  short_description: "Brutal repo drift auditor"
+  default_prompt: "Audit this repo for drift across docs, code, env vars, API keys, endpoints, providers, CI, deploy, and capabilities. Report exact contradictions with fixes."

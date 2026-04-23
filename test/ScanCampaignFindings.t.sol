@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.24;
 
-import {Test} from "forge-std/Test.sol";
+import { Test } from "forge-std/Test.sol";
 
-import {LaneVault4626} from "../src/LaneVault4626.sol";
-import {MockERC20} from "./mocks/MockERC20.sol";
+import { LaneVault4626 } from "../src/LaneVault4626.sol";
+import { MockERC20 } from "./mocks/MockERC20.sol";
 
 /// @title Scan Campaign Findings — LaneVault4626
 /// @notice Reproduces audit observations discovered during the March 2026 scan campaign.
